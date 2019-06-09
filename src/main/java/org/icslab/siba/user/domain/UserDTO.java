@@ -1,6 +1,7 @@
 package org.icslab.siba.user.domain;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
