@@ -11,7 +11,7 @@ import java.util.List;
 public class DeviceGroupingService {
 
     public List<VirtualHubDTO> grouping(List<DeviceVO> deviceList){
-        List<VirtualHubDTO> hubInfo = new ArrayList();
+        List<VirtualHubDTO> hubInfo = new ArrayList<>();
 
         int vhubId = -1;
         List<DeviceVO> devices = null;

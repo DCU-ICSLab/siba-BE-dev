@@ -39,7 +39,7 @@ public class UserController {
             .status(HttpStatus.OK)
             .data(new Object(){
                 public UserDTO user = userInfo;
-                public List<VirtualHubDTO> hubInfo = deviceGroupingService.grouping(deviceMapper.getDevice(userId));;
+                public List<VirtualHubDTO> hubInfo = deviceGroupingService.grouping(deviceMapper.getDevices(userId));;
             }).build();
     }
 }

@@ -5,15 +5,21 @@ import lombok.Data;
 @Data
 public class DeviceVO {
 
-    String authKey;
+    private String authKey;
 
-    Integer vHubId;
+    private Integer vHubId;
 
-    String devName;
+    private String devName;
 
-    String devDefName;
+    private String devDefName;
 
-    String devType;
+    private String devType;
 
-    String category;
+    private String category;
+
+    private Integer boxIdCnt;
+
+    private Integer codeCnt;
+
+    private Boolean haveEntry;
 }

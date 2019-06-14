@@ -1,7 +1,9 @@
 package org.icslab.siba.mappers;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.icslab.siba.devices.device.domain.BtnDerivationJoinVO;
 import org.icslab.siba.devices.device.domain.DeviceVO;
+import org.icslab.siba.devices.device.domain.TextBoxVO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,5 +12,11 @@ import java.util.List;
 @Repository
 public interface DeviceMapper {
 
-    List<DeviceVO> getDevice(Long userId);
+    DeviceVO getDevice(String authKey);
+
+    List<DeviceVO> getDevices(Long userId);
+
+    List<BtnDerivationJoinVO> getBtnAndDerivation(String authKey);
+
+    List<TextBoxVO> getBox(String authKey);
 }
