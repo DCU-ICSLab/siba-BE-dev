@@ -1,0 +1,163 @@
+package org.icslab.sibadev.devices.device.services;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.icslab.sibadev.devices.device.domain.BtnDerivationJoinVO;
+import org.icslab.sibadev.devices.device.domain.DeviceDTO;
+import org.icslab.sibadev.devices.device.domain.TextBoxVO;
+import org.icslab.sibadev.devices.device.domain.textboxgraph.*;
+import org.icslab.sibadev.mappers.DeviceMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class TextBoxGraphGenerateService {
+
+    @Autowired
+    private DeviceMapper deviceMapper;
+
+    @Getter
+    @Setter
+    class Counter{
+        private Integer value;
+
+        Counter(){
+            this.value=0;
+        }
+    }
+
+    public TextBoxGraphDTO generate(String authKey) {
+
+        //device information
+        DeviceDTO deviceDTO = deviceMapper.getDevice(authKey);
+
+        //source
+        List<TextBoxVO> textBoxVOList = deviceMapper.getBox(authKey);
+        List<BtnDerivationJoinVO> btnDerivationJoinVOList = deviceMapper.getBtnAndDerivation(authKey);
+
+        //target
+        List<TextBoxDTO> textBoxDTOList = new ArrayList<>();
+        List<LinkerDTO> linkerDTOList = new ArrayList<>();
+
+        Counter counterChild = new Counter();
+        Counter counterParent = new Counter();
+
+        for (TextBoxVO textBox : textBoxVOList) {
+            textBoxDTOList.add(
+                    TextBoxDTO.builder()
+                            .id(textBox.getBoxId())
+                            .pos(PositionDTO.builder()
+                                .x(textBox.getXAxis())
+                                .y(textBox.getYAxis())
+                                .build()
+                            )
+                            .type(textBox.getBoxType())
+                            .preorder(textBox.getPreText())
+                            .postorder(textBox.getPostText())
+                            .parentBox(this.getParentBoxesInfo(textBoxVOList, textBox.getBoxId(), counterParent))
+                            .info(this.getAdditionalInfo(
+                                    textBox.getBoxType()
+                                    ,btnDerivationJoinVOList
+                                    ,textBox.getBoxId()
+                                    ,counterChild
+                                    ,linkerDTOList))
+                            .linked(false)
+                            .linking(false)
+                            .build()
+            );
+        }
+
+        return TextBoxGraphDTO.builder()
+                .devAuthKey(deviceDTO.getAuthKey())
+                .vHubId(deviceDTO.getVHubId())
+                .devName(deviceDTO.getDevName())
+                .blockIdCounter(deviceDTO.getBoxIdCnt())
+                .codeIdCounter(deviceDTO.getCodeCnt())
+                .eventCodeIdCounter(deviceDTO.getEvCodeCnt())
+                .haveEntry(deviceDTO.getHaveEntry())
+                .pallet(textBoxDTOList)
+                .linkers(linkerDTOList)
+                .build();
+    }
+
+    private InfoDTO getAdditionalInfo(int boxType , List<BtnDerivationJoinVO> list, int boxId, Counter counter, List<LinkerDTO> linkerList) {
+        InfoDTO info = null;
+        switch (boxType) {
+            case 1:
+                info = InfoDTO.builder()
+                        .buttons(getButtonsInfo(list, boxId, counter, linkerList))
+                        .build();
+                break;
+            default:
+                break;
+        }
+        return info;
+    }
+
+    private List<ButtonDTO> getButtonsInfo(List<BtnDerivationJoinVO> list, int boxId, Counter counter, List<LinkerDTO> linkerList){
+        List<ButtonDTO> buttonList = new ArrayList<>();
+        for(int i = counter.getValue(); i < list.size(); i++) {
+            BtnDerivationJoinVO btn = list.get(i);
+            //boxId가 같지 않다면 루프 탈출
+            if(btn.getBoxId()!=boxId){
+                counter.setValue(i);
+                break;
+            }
+
+            LinkerDTO tempLinker = LinkerDTO.builder()
+                    .childId(btn.getCBoxId())
+                    .parentId(btn.getBoxId())
+                    .code(btn.getBtnCode())
+                    .m(PositionDTO.builder()
+                        .x(btn.getMx())
+                        .y(btn.getMy())
+                        .build()
+                    )
+                    .z(PositionDTO.builder()
+                        .x(btn.getMx())
+                        .y(btn.getMy())
+                        .build()
+                    )
+                    .build();
+
+            linkerList.add(tempLinker);
+
+            buttonList.add(
+                ButtonDTO.builder()
+                    .code(btn.getBtnCode())
+                    .name(btn.getBtnName())
+                    .idx(btn.getIdx())
+                    .eventCode(btn.getEventCode())
+                    .isSpread(btn.getIsSpread())
+                    .linker(tempLinker)
+                    .build()
+            );
+        }
+        return buttonList;
+    }
+
+    private List<ParentBoxDTO> getParentBoxesInfo(List<TextBoxVO> textBoxVOList, int boxId, Counter counter){
+        List<ParentBoxDTO> parentBoxes = new ArrayList<>();
+
+        for(int i=counter.getValue(); i < textBoxVOList.size(); i++){
+            TextBoxVO box = textBoxVOList.get(i);
+            //boxId가 같지 않다면 루프 탈출
+            if(box.getBoxId()!=boxId){
+                counter.setValue(i);
+                break;
+            }
+
+            parentBoxes.add(
+                ParentBoxDTO.builder()
+                    .parentId(box.getPBoxId())
+                    .code(box.getBtnCode())
+                    .build()
+            );
+        }
+
+        return parentBoxes;
+    }
+}
