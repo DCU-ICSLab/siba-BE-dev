@@ -2,7 +2,7 @@ package org.icslab.sibadev.devices.vhub.domain;
 
 import lombok.Builder;
 import lombok.Data;
-import org.icslab.sibadev.devices.device.domain.DeviceDTO;
+import org.icslab.sibadev.devices.device.domain.DeviceShortDTO;
 
 import java.util.List;
 
@@ -11,5 +11,5 @@ import java.util.List;
 public class VirtualHubDTO {
 
     public Integer vhubId;
-    public List<DeviceDTO> devices;
+    public List<DeviceShortDTO> devices;
 }

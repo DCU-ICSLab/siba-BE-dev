@@ -42,7 +42,7 @@ app:
 
 mybatis:
   config-location: classpath:mybatis-config.xml
-  mapper-locations: classpath:org.icslab.siba/**/*.xml #*Mapper.xml이 위치한 경로
+  mapper-locations: classpath:org.icslab.sibadev/**/*.xml #*Mapper.xml이 위치한 경로
 #spring.profiles.include: develop-db
 
 server:

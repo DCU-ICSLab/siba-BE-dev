@@ -17,7 +17,7 @@ public class BtnDerivationJoinVO {
 
     private int idx;
 
-    private int cBoxId;
+    private Integer cBoxId;
 
     private double mx;
 

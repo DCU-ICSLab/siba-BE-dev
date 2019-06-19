@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @Slf4j
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperties.class)
-@MapperScan(basePackages="org.icslab.siba.mappers")
+@MapperScan(basePackages="org.icslab.sibadev.mappers")
 public class SibadevApplication {
 
     public static final String APP_LOCATIONS = "spring.config.location=" +

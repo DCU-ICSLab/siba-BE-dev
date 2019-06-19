@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.icslab.siba.mappers.VirtualHubMapper">
+<mapper namespace="org.icslab.sibadev.mappers.VirtualHubMapper">
 
 
     <!-- userId를 이용하여 userinfo get -->

@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.icslab.siba.mappers.UserMapper">
+<mapper namespace="org.icslab.sibadev.mappers.UserMapper">
 
 
     <!-- userId를 이용하여 userinfo get -->
@@ -57,7 +57,7 @@
     </update>
 
     <!-- <result property="userId" column="user_id"/> -->
-    <resultMap id="UserDTO" type="org.icslab.siba.user.domain.UserDTO">
+    <resultMap id="UserDTO" type="org.icslab.sibadev.user.domain.UserDTO">
         <result property="userId" column="users_id"/>
         <result property="providerId" column="provider_id"/>
         <result property="name" column="name"/>
@@ -66,7 +66,7 @@
     </resultMap>
 
 
-    <parameterMap id="UserDTO" type="org.icslab.siba.user.domain.UserDTO">
+    <parameterMap id="UserDTO" type="org.icslab.sibadev.user.domain.UserDTO">
         <parameter property="userId"/>
         <parameter property="providerId"/>
         <parameter property="name"/>

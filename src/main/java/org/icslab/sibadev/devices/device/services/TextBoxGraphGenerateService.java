@@ -45,7 +45,11 @@ public class TextBoxGraphGenerateService {
         Counter counterChild = new Counter();
         Counter counterParent = new Counter();
 
+        Integer prevBoxId = -1;
         for (TextBoxVO textBox : textBoxVOList) {
+            Integer curBoxId = textBox.getBoxId();
+            if(prevBoxId.equals(curBoxId)) continue;
+            prevBoxId = curBoxId;
             textBoxDTOList.add(
                     TextBoxDTO.builder()
                             .id(textBox.getBoxId())
@@ -66,6 +70,7 @@ public class TextBoxGraphGenerateService {
                                     ,linkerDTOList))
                             .linked(false)
                             .linking(false)
+                            .height(textBox.getHeight())
                             .build()
             );
         }
@@ -87,6 +92,7 @@ public class TextBoxGraphGenerateService {
         InfoDTO info = null;
         switch (boxType) {
             case 1:
+            case 5:
                 info = InfoDTO.builder()
                         .buttons(getButtonsInfo(list, boxId, counter, linkerList))
                         .build();
@@ -101,29 +107,33 @@ public class TextBoxGraphGenerateService {
         List<ButtonDTO> buttonList = new ArrayList<>();
         for(int i = counter.getValue(); i < list.size(); i++) {
             BtnDerivationJoinVO btn = list.get(i);
+
             //boxId가 같지 않다면 루프 탈출
             if(btn.getBoxId()!=boxId){
                 counter.setValue(i);
                 break;
             }
 
-            LinkerDTO tempLinker = LinkerDTO.builder()
-                    .childId(btn.getCBoxId())
-                    .parentId(btn.getBoxId())
-                    .code(btn.getBtnCode())
-                    .m(PositionDTO.builder()
-                        .x(btn.getMx())
-                        .y(btn.getMy())
-                        .build()
-                    )
-                    .z(PositionDTO.builder()
-                        .x(btn.getMx())
-                        .y(btn.getMy())
-                        .build()
-                    )
-                    .build();
+            LinkerDTO tempLinker = null;
+            if(btn.getCBoxId()!=null){
+                tempLinker = LinkerDTO.builder()
+                        .childId(btn.getCBoxId())
+                        .parentId(btn.getBoxId())
+                        .code(btn.getBtnCode())
+                        .m(PositionDTO.builder()
+                                .x(btn.getMx())
+                                .y(btn.getMy())
+                                .build()
+                        )
+                        .z(PositionDTO.builder()
+                                .x(btn.getZx())
+                                .y(btn.getZy())
+                                .build()
+                        )
+                        .build();
 
-            linkerList.add(tempLinker);
+                linkerList.add(tempLinker);
+            }
 
             buttonList.add(
                 ButtonDTO.builder()
@@ -144,6 +154,12 @@ public class TextBoxGraphGenerateService {
 
         for(int i=counter.getValue(); i < textBoxVOList.size(); i++){
             TextBoxVO box = textBoxVOList.get(i);
+
+            if(box.getPBoxId()==null){
+                counter.setValue(i+1);
+                break;
+            }
+
             //boxId가 같지 않다면 루프 탈출
             if(box.getBoxId()!=boxId){
                 counter.setValue(i);

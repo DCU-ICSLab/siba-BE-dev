@@ -36,8 +36,6 @@ public class UserController {
 
         List<VirtualHubDTO> hubInfoList = deviceGroupingService.grouping(deviceMapper.getDevices(userId));
 
-        System.out.println(userId);
-
         return ResponseDTO.builder()
             .msg("user information")
             .status(HttpStatus.OK)

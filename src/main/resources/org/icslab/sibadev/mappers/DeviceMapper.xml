@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.icslab.sibadev.mappers.DeviceMapper">
+
+    <select id="getDevice" resultMap="Device" parameterType="String">
+        SELECT auth_key,
+               vhub_id,
+               dev_name,
+               dev_def_name,
+               dev_type,
+               category,
+               box_id_cnt,
+               code_cnt,
+               have_entry,
+               evcode_cnt
+        FROM dev
+        where auth_key=#{authKey}
+    </select>
+
+    <select id="getBox" resultMap="TextBox" parameterType="String">
+        SELECT box.box_id,
+               box.pre_text,
+               box.post_text,
+               box.box_type,
+               box.xaxis,
+               box.yaxis,
+               box.height,
+               d.pbox_id,
+               d.btn_code
+        FROM box as box
+        LEFT OUTER JOIN derivation as d
+        on box.box_id = d.cbox_id
+        where box.auth_key=#{authKey}
+        ORDER BY box.box_id;
+    </select>
+
+    <select id="getBtnAndDerivation" resultMap="BtnDerivationJoin" parameterType="String">
+        <!--SELECT btn.box_id,
+               btn.btn_code,
+               btn.ev_code,
+               btn.is_spread,
+               btn.idx,
+               btn.btn_name,
+               btn.idx,
+               d.cbox_id,
+               d.mx,
+               d.my,
+               d.zx,
+               d.zy
+        FROM btn as btn, box as box
+        LEFT OUTER JOIN derivation as d
+        ON box.box_id = d.pbox_id
+        WHERE box.auth_key = #{authKey}
+        order by btn.box_id, btn.idx;-->
+        SELECT
+        btn.box_id,
+        btn.btn_code,
+        btn.ev_code,
+        btn.is_spread,
+        btn.idx,
+        btn.btn_name,
+        d.cbox_id,
+        d.mx,
+        d.my,
+        d.zx,
+        d.zy
+        FROM
+        btn as btn
+        LEFT OUTER JOIN derivation as d
+        ON btn.btn_code = d.btn_code
+        where btn.auth_key=#{authKey}
+        order by btn.box_id, btn.idx;
+    </select>
+
+    <!-- userId를 이용하여 userinfo get -->
+    <select id="getDevices" resultMap="DeviceSummary" parameterType="Long">
+        SELECT v.vhub_id,
+               d.auth_key,
+               d.dev_name,
+               d.dev_def_name,
+               d.dev_type,
+               d.category
+        FROM vhub as v
+        LEFT OUTER JOIN dev as d
+        ON v.vhub_id = d.vhub_id
+        WHERE v.users_id = #{userId};
+    </select>
+    
+    <update id="updateDevice" parameterType="org.icslab.sibadev.devices.device.domain.DeviceDTO">
+        UPDATE dev
+        SET box_id_cnt=#{boxIdCnt},
+            code_cnt=#{codeCnt},
+            have_entry=#{haveEntry},
+            evcode_cnt=#{evCodeCnt}
+        WHERE auth_key=#{authKey}
+    </update>
+
+    <delete id="deleteTextBoxes" parameterType="String">
+        delete from box
+        where auth_key=#{authKey}
+    </delete>
+
+    <delete id="deleteDerivations" parameterType="String">
+        delete from derivation
+        where auth_key=#{authKey}
+    </delete>
+
+    <delete id="deleteButtons" parameterType="String">
+        delete from btn
+        where auth_key=#{authKey}
+    </delete>
+
+    <!--text box set insertion-->
+    <insert id="insertTextBoxes" parameterType="java.util.Map">
+        insert into box(box_id, pre_text, post_text, auth_key, box_type, xaxis, yaxis, height)
+        values
+        <foreach collection="textBoxDTOList" item="item" separator=" , ">
+            (
+              #{item.id},
+              #{item.preorder},
+              #{item.postorder},
+              #{authKey},
+              #{item.type},
+              #{item.pos.x},
+              #{item.pos.y},
+              #{item.height}
+            )
+        </foreach>
+    </insert>
+
+    <!--button set insertion-->
+    <insert id="insertButtons" parameterType="java.util.Map">
+        insert into btn(btn_name, btn_code, idx, box_id, ev_code, is_spread, auth_key)
+        values
+        <foreach collection="buttonDTOList" item="item" separator=" , ">
+            (
+            #{item.buttonDTO.name},
+            #{item.buttonDTO.code},
+            #{item.buttonDTO.idx},
+            #{item.boxId},
+            #{item.buttonDTO.eventCode},
+            #{item.buttonDTO.isSpread},
+            #{authKey}
+            )
+        </foreach>
+    </insert>
+
+    <!--linker set insertion-->
+    <insert id="insertLinkers" parameterType="java.util.Map">
+        insert into derivation(mx, my, zx, zy, btn_code, cbox_id, pbox_id, auth_key)
+        values
+        <foreach collection="linkerDTOList" item="item" separator=" , ">
+            (
+            #{item.m.x},
+            #{item.m.y},
+            #{item.z.x},
+            #{item.z.y},
+            #{item.code},
+            #{item.childId},
+            #{item.parentId},
+            #{authKey}
+            )
+        </foreach>
+    </insert>
+
+    <resultMap id="DeviceSummary" type="org.icslab.sibadev.devices.device.domain.DeviceShortDTO">
+        <result property="vHubId" column="vhub_id"/>
+        <result property="authKey" column="auth_key"/>
+        <result property="devName" column="dev_name"/>
+        <result property="devDefName" column="dev_def_name"/>
+        <result property="devType" column="dev_type"/>
+        <result property="category" column="category"/>
+    </resultMap>
+
+    <resultMap id="Device" type="org.icslab.sibadev.devices.device.domain.DeviceDTO">
+        <result property="authKey" column="auth_key"/>
+        <result property="devName" column="dev_name"/>
+        <result property="devDefName" column="dev_def_name"/>
+        <result property="devType" column="dev_type"/>
+        <result property="category" column="category"/>
+        <result property="vHubId" column="vhub_id"/>
+        <result property="boxIdCnt" column="box_id_cnt"/>
+        <result property="codeCnt" column="code_cnt"/>
+        <result property="haveEntry" column="have_entry"/>
+        <result property="evCodeCnt" column="evcode_cnt"/>
+    </resultMap>
+
+    <resultMap id="BtnDerivationJoin" type="org.icslab.sibadev.devices.device.domain.BtnDerivationJoinVO">
+        <result property="boxId" column="box_id"/>
+        <result property="btnCode" column="btn_code"/>
+        <result property="btnName" column="btn_name"/>
+        <result property="idx" column="idx"/>
+        <result property="eventCode" column="ev_code"/>
+        <result property="isSpread" column="is_spread"/>
+        <result property="cBoxId" column="cbox_id"/>
+        <result property="mx" column="mx"/>
+        <result property="my" column="my"/>
+        <result property="zx" column="zx"/>
+        <result property="zy" column="zy"/>
+    </resultMap>
+
+    <resultMap id="TextBox" type="org.icslab.sibadev.devices.device.domain.TextBoxVO">
+        <result property="boxId" column="box_id"/>
+        <result property="preText" column="pre_text"/>
+        <result property="postText" column="post_text"/>
+        <result property="boxType" column="box_type"/>
+        <result property="xAxis" column="xaxis"/>
+        <result property="yAxis" column="yaxis"/>
+        <result property="height" column="height"/>
+        <result property="pBoxId" column="pbox_id"/>
+        <result property="btnCode" column="btn_code"/>
+    </resultMap>
+</mapper>

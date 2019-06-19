@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ParentBoxDTO {
-    private int parentId;
-    private int code;
+    private Integer parentId;
+    private Integer code;
 }

@@ -19,7 +19,7 @@ public class TextBoxVO {
 
     private int height;
 
-    private int pBoxId;
+    private Integer pBoxId;
 
-    private int btnCode;
+    private Integer btnCode;
 }

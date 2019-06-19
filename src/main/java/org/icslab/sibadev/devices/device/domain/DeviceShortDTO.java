@@ -1,14 +1,9 @@
 package org.icslab.sibadev.devices.device.domain;
 
-import lombok.Builder;
 import lombok.Data;
-import lombok.ToString;
 
 @Data
-@Builder
-@ToString
-public class DeviceDTO {
-
+public class DeviceShortDTO {
     private String authKey;
 
     private Integer vHubId;
@@ -20,12 +15,4 @@ public class DeviceDTO {
     private String devType;
 
     private String category;
-
-    private Integer boxIdCnt;
-
-    private Integer codeCnt;
-
-    private Integer evCodeCnt;
-
-    private Boolean haveEntry;
 }
