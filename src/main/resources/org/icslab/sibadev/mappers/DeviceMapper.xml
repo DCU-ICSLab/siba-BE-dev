@@ -20,7 +20,35 @@
         where auth_key=#{authKey}
     </select>
 
-    <select id="getBox" resultMap="TextBox" parameterType="String">
+    <select id="getBoxes" parameterType="String" resultType="org.icslab.sibadev.devices.device.domain.deployset.BoxDTO">
+        SELECT box_id,
+               pre_text,
+               post_text,
+               box_type
+        FROM box
+        WHERE auth_key=#{authKey}
+    </select>
+
+    <select id="getButtons" parameterType="String" resultType="org.icslab.sibadev.devices.device.domain.deployset.ButtonDTO">
+        SELECT btn_name,
+               btn_code,
+               idx,
+               box_id,
+               ev_code,
+               is_spread
+        FROM btn
+        WHERE auth_key=#{authKey}
+    </select>
+
+    <select id="getDerivations" parameterType="String" resultType="org.icslab.sibadev.devices.device.domain.deployset.DerivationDTO">
+        SELECT btn_code,
+               cbox_id,
+               pbox_id
+        FROM derivation
+        WHERE auth_key=#{authKey}
+    </select>
+
+    <select id="getBoxAndDerivation" resultMap="TextBox" parameterType="String">
         SELECT box.box_id,
                box.pre_text,
                box.post_text,

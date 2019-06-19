@@ -6,6 +6,9 @@ import org.icslab.sibadev.devices.device.domain.BtnDerivationJoinVO;
 import org.icslab.sibadev.devices.device.domain.DeviceDTO;
 import org.icslab.sibadev.devices.device.domain.DeviceShortDTO;
 import org.icslab.sibadev.devices.device.domain.TextBoxVO;
+import org.icslab.sibadev.devices.device.domain.deployset.BoxDTO;
+import org.icslab.sibadev.devices.device.domain.deployset.ButtonDTO;
+import org.icslab.sibadev.devices.device.domain.deployset.DerivationDTO;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.ButtonWrapperDTO;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.LinkerDTO;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.TextBoxDTO;
@@ -21,9 +24,15 @@ public interface DeviceMapper {
 
     List<DeviceShortDTO> getDevices(Long userId);
 
+    List<BoxDTO> getBoxes(String authKey);
+
+    List<ButtonDTO> getButtons(String authKey);
+
+    List<DerivationDTO> getDerivations(String authKey);
+
     List<BtnDerivationJoinVO> getBtnAndDerivation(String authKey);
 
-    List<TextBoxVO> getBox(String authKey);
+    List<TextBoxVO> getBoxAndDerivation(String authKey);
 
     void updateDevice(DeviceDTO deviceDTO);
 

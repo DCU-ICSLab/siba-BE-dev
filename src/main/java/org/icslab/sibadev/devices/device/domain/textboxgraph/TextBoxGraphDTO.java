@@ -23,7 +23,7 @@ public class TextBoxGraphDTO {
 
     private int eventCodeIdCounter;
 
-    private boolean haveEntry;
+    private Boolean haveEntry;
 
     private List<TextBoxDTO> pallet;
 

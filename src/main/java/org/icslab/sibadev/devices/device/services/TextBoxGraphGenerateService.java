@@ -35,7 +35,7 @@ public class TextBoxGraphGenerateService {
         DeviceDTO deviceDTO = deviceMapper.getDevice(authKey);
 
         //source
-        List<TextBoxVO> textBoxVOList = deviceMapper.getBox(authKey);
+        List<TextBoxVO> textBoxVOList = deviceMapper.getBoxAndDerivation(authKey);
         List<BtnDerivationJoinVO> btnDerivationJoinVOList = deviceMapper.getBtnAndDerivation(authKey);
 
         //target

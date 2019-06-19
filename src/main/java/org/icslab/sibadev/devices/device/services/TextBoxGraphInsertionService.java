@@ -34,6 +34,7 @@ public class TextBoxGraphInsertionService {
                 .boxIdCnt(textBoxGraphDTO.getBlockIdCounter())
                 .codeCnt(textBoxGraphDTO.getCodeIdCounter())
                 .evCodeCnt(textBoxGraphDTO.getEventCodeIdCounter())
+                .haveEntry(textBoxGraphDTO.getHaveEntry())
                 .build()
         );
 
