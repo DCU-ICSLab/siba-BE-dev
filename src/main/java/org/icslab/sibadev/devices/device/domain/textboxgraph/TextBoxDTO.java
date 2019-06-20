@@ -22,7 +22,9 @@ public class TextBoxDTO {
 
     private List<ParentBoxDTO> parentBox;
 
-    private int height;
+    private Integer headRow;
+
+    private Integer footRow;
 
     private int id;
 

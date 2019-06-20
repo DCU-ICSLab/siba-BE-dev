@@ -55,7 +55,8 @@
                box.box_type,
                box.xaxis,
                box.yaxis,
-               box.height,
+               box.head_row,
+               box.foot_row,
                d.pbox_id,
                d.btn_code
         FROM box as box
@@ -143,7 +144,7 @@
 
     <!--text box set insertion-->
     <insert id="insertTextBoxes" parameterType="java.util.Map">
-        insert into box(box_id, pre_text, post_text, auth_key, box_type, xaxis, yaxis, height)
+        insert into box(box_id, pre_text, post_text, auth_key, box_type, xaxis, yaxis, head_row, foot_row)
         values
         <foreach collection="textBoxDTOList" item="item" separator=" , ">
             (
@@ -154,7 +155,8 @@
               #{item.type},
               #{item.pos.x},
               #{item.pos.y},
-              #{item.height}
+              #{item.headRow},
+              #{item.footRow}
             )
         </foreach>
     </insert>
@@ -237,7 +239,8 @@
         <result property="boxType" column="box_type"/>
         <result property="xAxis" column="xaxis"/>
         <result property="yAxis" column="yaxis"/>
-        <result property="height" column="height"/>
+        <result property="headRow" column="head_row"/>
+        <result property="footRow" column="foot_row"/>
         <result property="pBoxId" column="pbox_id"/>
         <result property="btnCode" column="btn_code"/>
     </resultMap>

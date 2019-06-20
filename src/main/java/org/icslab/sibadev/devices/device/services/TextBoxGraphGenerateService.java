@@ -70,7 +70,8 @@ public class TextBoxGraphGenerateService {
                                     ,linkerDTOList))
                             .linked(false)
                             .linking(false)
-                            .height(textBox.getHeight())
+                            .headRow(textBox.getHeadRow())
+                            .footRow(textBox.getFootRow())
                             .build()
             );
         }

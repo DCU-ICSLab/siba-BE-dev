@@ -17,7 +17,9 @@ public class TextBoxVO {
 
     private double yAxis; //y axis
 
-    private int height;
+    private Integer headRow;
+
+    private Integer footRow;
 
     private Integer pBoxId;
 
