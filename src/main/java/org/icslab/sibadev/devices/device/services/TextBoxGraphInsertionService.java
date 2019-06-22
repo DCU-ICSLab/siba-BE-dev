@@ -17,15 +17,15 @@ import java.util.List;
 public class TextBoxGraphInsertionService {
 
     @Autowired
-    DeviceMapper deviceMapper;
+    private DeviceMapper deviceMapper;
+
+    @Autowired
+    TextBoxGraphDeletionService textBoxGraphDeletionService;
 
     @Transactional(rollbackFor = Exception.class)
     public void insertion(TextBoxGraphDTO textBoxGraphDTO){
 
-        //derivation ->btn ->box 순으로 삭제
-        deviceMapper.deleteDerivations(textBoxGraphDTO.getDevAuthKey());
-        deviceMapper.deleteButtons(textBoxGraphDTO.getDevAuthKey());
-        deviceMapper.deleteTextBoxes(textBoxGraphDTO.getDevAuthKey());
+        textBoxGraphDeletionService.delete(textBoxGraphDTO.getDevAuthKey());
 
         //dev의 box_id_cnt, code_cnt, have_entry update
         deviceMapper.updateDevice(

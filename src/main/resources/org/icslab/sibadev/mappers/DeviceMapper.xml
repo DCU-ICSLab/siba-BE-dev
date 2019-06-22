@@ -20,7 +20,7 @@
         where auth_key=#{authKey}
     </select>
 
-    <select id="getBoxes" parameterType="String" resultType="org.icslab.sibadev.devices.device.domain.deployset.BoxDTO">
+    <select id="getBoxes" parameterType="String" resultMap="DeployBox">
         SELECT box_id,
                pre_text,
                post_text,
@@ -29,7 +29,7 @@
         WHERE auth_key=#{authKey}
     </select>
 
-    <select id="getButtons" parameterType="String" resultType="org.icslab.sibadev.devices.device.domain.deployset.ButtonDTO">
+    <select id="getButtons" parameterType="String" resultMap="DeployButton">
         SELECT btn_name,
                btn_code,
                idx,
@@ -40,7 +40,7 @@
         WHERE auth_key=#{authKey}
     </select>
 
-    <select id="getDerivations" parameterType="String" resultType="org.icslab.sibadev.devices.device.domain.deployset.DerivationDTO">
+    <select id="getDerivations" parameterType="String" resultMap="DeployDerivation">
         SELECT btn_code,
                cbox_id,
                pbox_id
@@ -241,6 +241,28 @@
         <result property="yAxis" column="yaxis"/>
         <result property="headRow" column="head_row"/>
         <result property="footRow" column="foot_row"/>
+        <result property="pBoxId" column="pbox_id"/>
+        <result property="btnCode" column="btn_code"/>
+    </resultMap>
+
+    <resultMap id="DeployBox" type="org.icslab.sibadev.devices.device.domain.deployset.BoxDTO">
+        <result property="boxId" column="box_id"/>
+        <result property="preText" column="pre_text"/>
+        <result property="postText" column="post_text"/>
+        <result property="boxType" column="box_type"/>
+    </resultMap>
+
+    <resultMap id="DeployButton" type="org.icslab.sibadev.devices.device.domain.deployset.ButtonDTO">
+        <result property="boxId" column="box_id"/>
+        <result property="btnCode" column="btn_code"/>
+        <result property="btnName" column="btn_name"/>
+        <result property="idx" column="idx"/>
+        <result property="eventCode" column="ev_code"/>
+        <result property="isSpread" column="is_spread"/>
+    </resultMap>
+
+    <resultMap id="DeployDerivation" type="org.icslab.sibadev.devices.device.domain.deployset.DerivationDTO">
+        <result property="cBoxId" column="cbox_id"/>
         <result property="pBoxId" column="pbox_id"/>
         <result property="btnCode" column="btn_code"/>
     </resultMap>

@@ -25,10 +25,13 @@ public class DeviceController {
 
     @GetMapping("/device/{authKey}")
     public ResponseDTO getDeviceInformation(@PathVariable String authKey){
+
+        TextBoxGraphDTO textBoxGraphDTO = textBoxGraphGenerateService.generate(authKey);
+        System.out.println(textBoxGraphDTO);
         return ResponseDTO.builder()
                 .msg("textbox graph info")
                 .status(HttpStatus.OK)
-                .data(textBoxGraphGenerateService.generate(authKey))
+                .data(textBoxGraphDTO)
                 .build();
     }
 

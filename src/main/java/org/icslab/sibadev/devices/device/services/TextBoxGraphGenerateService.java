@@ -93,6 +93,8 @@ public class TextBoxGraphGenerateService {
         InfoDTO info = null;
         switch (boxType) {
             case 1:
+            case 2:
+            case 3:
             case 5:
                 info = InfoDTO.builder()
                         .buttons(getButtonsInfo(list, boxId, counter, linkerList))
