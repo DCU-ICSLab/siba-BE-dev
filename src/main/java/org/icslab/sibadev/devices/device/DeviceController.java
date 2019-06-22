@@ -6,6 +6,7 @@ import org.icslab.sibadev.devices.device.domain.textboxgraph.TextBoxGraphDTO;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphDeployService;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphGenerateService;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphInsertionService;
+import org.icslab.sibadev.devices.device.services.UniqueKeyGenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,10 @@ public class DeviceController {
     @Autowired
     TextBoxGraphDeployService textBoxGraphDeployService;
 
-    @GetMapping("/device/{authKey}")
+    @Autowired
+    UniqueKeyGenService uniqueKeyGenService;
+
+   @GetMapping("/device/{authKey}")
     public ResponseDTO getDeviceInformation(@PathVariable String authKey){
 
         TextBoxGraphDTO textBoxGraphDTO = textBoxGraphGenerateService.generate(authKey);
@@ -50,5 +54,14 @@ public class DeviceController {
     @PostMapping("/device/{authKey}/deploy")
     public ResponseDTO saveDeviceInformation(@PathVariable String authKey){
         return textBoxGraphDeployService.deploy(authKey);
+    }
+
+    @PostMapping("/device/authkey")
+    public ResponseDTO createAndReturnUniqueKey(){
+        return ResponseDTO.builder()
+                .msg("device authentication key")
+                .status(HttpStatus.OK)
+                .data(uniqueKeyGenService.generate())
+                .build();
     }
 }
