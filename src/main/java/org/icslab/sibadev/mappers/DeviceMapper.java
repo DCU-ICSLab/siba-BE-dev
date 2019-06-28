@@ -34,6 +34,8 @@ public interface DeviceMapper {
 
     List<TextBoxVO> getBoxAndDerivation(String authKey);
 
+    void createDevice(DeviceDTO deviceDTO);
+
     void updateDevice(DeviceDTO deviceDTO);
 
     void deleteTextBoxes(String authKey);

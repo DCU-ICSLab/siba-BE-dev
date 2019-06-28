@@ -15,6 +15,8 @@ public class BtnDerivationJoinVO {
 
     private String btnName;
 
+    private String type;
+
     private int idx;
 
     private Integer cBoxId;

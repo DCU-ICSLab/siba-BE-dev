@@ -1,16 +1,18 @@
 package org.icslab.sibadev.devices.device.domain;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @ToString
 public class DeviceDTO {
 
     private String authKey;
 
+    @JsonProperty(value = "vHubId")
     private Integer vHubId;
 
     private String devName;

@@ -2,11 +2,13 @@ package org.icslab.sibadev.devices.device;
 
 import lombok.extern.slf4j.Slf4j;
 import org.icslab.sibadev.common.domain.response.ResponseDTO;
+import org.icslab.sibadev.devices.device.domain.DeviceDTO;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.TextBoxGraphDTO;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphDeployService;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphGenerateService;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphInsertionService;
 import org.icslab.sibadev.devices.device.services.UniqueKeyGenService;
+import org.icslab.sibadev.mappers.DeviceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,16 +18,19 @@ import org.springframework.web.bind.annotation.*;
 public class DeviceController {
 
     @Autowired
-    TextBoxGraphGenerateService textBoxGraphGenerateService;
+    private TextBoxGraphGenerateService textBoxGraphGenerateService;
 
     @Autowired
-    TextBoxGraphInsertionService textBoxGraphInsertionService;
+    private TextBoxGraphInsertionService textBoxGraphInsertionService;
 
     @Autowired
-    TextBoxGraphDeployService textBoxGraphDeployService;
+    private TextBoxGraphDeployService textBoxGraphDeployService;
 
     @Autowired
-    UniqueKeyGenService uniqueKeyGenService;
+    private UniqueKeyGenService uniqueKeyGenService;
+
+    @Autowired
+    private DeviceMapper deviceMapper;
 
    @GetMapping("/device/{authKey}")
     public ResponseDTO getDeviceInformation(@PathVariable String authKey){
@@ -37,6 +42,25 @@ public class DeviceController {
                 .status(HttpStatus.OK)
                 .data(textBoxGraphDTO)
                 .build();
+    }
+
+    @PostMapping("/device")
+    public ResponseDTO createIoTDevice(@RequestBody DeviceDTO deviceDTO){
+
+       deviceDTO.setBoxIdCnt(1);
+       deviceDTO.setCodeCnt(0);
+       deviceDTO.setEvCodeCnt(0);
+       deviceDTO.setHaveEntry(false);
+
+        System.out.println(deviceDTO);
+
+       deviceMapper.createDevice(deviceDTO);
+
+       return ResponseDTO.builder()
+               .msg("IoT device create is success")
+               .status(HttpStatus.OK)
+               .data(deviceDTO)
+               .build();
     }
 
     @PostMapping("/device/{authKey}")

@@ -21,4 +21,6 @@ public class ButtonDTO {
     private Boolean isSpread;
 
     private Integer eventCode;
+
+    private String type;
 }

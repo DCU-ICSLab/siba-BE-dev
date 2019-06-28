@@ -143,6 +143,7 @@ public class TextBoxGraphGenerateService {
                     .code(btn.getBtnCode())
                     .name(btn.getBtnName())
                     .idx(btn.getIdx())
+                    .type(btn.getType())
                     .eventCode(btn.getEventCode())
                     .isSpread(btn.getIsSpread())
                     .linker(tempLinker)

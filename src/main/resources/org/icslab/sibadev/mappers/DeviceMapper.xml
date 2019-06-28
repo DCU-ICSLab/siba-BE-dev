@@ -33,6 +33,7 @@
         SELECT btn_name,
                btn_code,
                idx,
+               btn_type,
                box_id,
                ev_code,
                is_spread
@@ -91,6 +92,7 @@
         btn.is_spread,
         btn.idx,
         btn.btn_name,
+        btn.btn_type,
         d.cbox_id,
         d.mx,
         d.my,
@@ -142,6 +144,22 @@
         where auth_key=#{authKey}
     </delete>
 
+    <insert id="createDevice" parameterType="org.icslab.sibadev.devices.device.domain.DeviceDTO">
+        insert into dev(auth_key, dev_name, dev_def_name, dev_type, category, vhub_id, box_id_cnt, code_cnt, have_entry, evcode_cnt)
+        values (
+          #{authKey},
+          #{devName},
+          #{devDefName},
+          #{devType},
+          #{category},
+          #{vHubId},
+          #{boxIdCnt},
+          #{codeCnt},
+          #{haveEntry},
+          #{evCodeCnt}
+        )
+    </insert>
+
     <!--text box set insertion-->
     <insert id="insertTextBoxes" parameterType="java.util.Map">
         insert into box(box_id, pre_text, post_text, auth_key, box_type, xaxis, yaxis, head_row, foot_row)
@@ -163,7 +181,7 @@
 
     <!--button set insertion-->
     <insert id="insertButtons" parameterType="java.util.Map">
-        insert into btn(btn_name, btn_code, idx, box_id, ev_code, is_spread, auth_key)
+        insert into btn(btn_name, btn_code, idx, box_id, ev_code, is_spread, btn_type, auth_key)
         values
         <foreach collection="buttonDTOList" item="item" separator=" , ">
             (
@@ -173,6 +191,7 @@
             #{item.boxId},
             #{item.buttonDTO.eventCode},
             #{item.buttonDTO.isSpread},
+            #{item.buttonDTO.type},
             #{authKey}
             )
         </foreach>
@@ -222,6 +241,7 @@
         <result property="boxId" column="box_id"/>
         <result property="btnCode" column="btn_code"/>
         <result property="btnName" column="btn_name"/>
+        <result property="type" column="btn_type"/>
         <result property="idx" column="idx"/>
         <result property="eventCode" column="ev_code"/>
         <result property="isSpread" column="is_spread"/>
@@ -257,6 +277,7 @@
         <result property="btnCode" column="btn_code"/>
         <result property="btnName" column="btn_name"/>
         <result property="idx" column="idx"/>
+        <result property="type" column="btn_type"/>
         <result property="eventCode" column="ev_code"/>
         <result property="isSpread" column="is_spread"/>
     </resultMap>
