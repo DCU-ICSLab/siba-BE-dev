@@ -15,10 +15,11 @@ public class DeviceBoxSearchSerivce {
     @Autowired
     private TestMapper testMapper;
 
-    public TextBoxDTO search(String authKey, int boxId){
-        TextBoxVO textBoxVO = testMapper.getTextBox(authKey, boxId);
-        List<ButtonVO> buttonVOS = testMapper.getTextButton(authKey, boxId);
+    public TextBoxDTO search(Integer devId, Integer boxId){
+        TextBoxVO textBoxVO = testMapper.getTextBox(devId, boxId);
+        List<ButtonVO> buttonVOS = testMapper.getTextButton(devId, boxId);
 
+        //textBoxVO의 데이터가 아무 것도 없다면 Null pointer exception발생
         return TextBoxDTO.builder()
                 .boxId(textBoxVO.getBoxId())
                 .preText(textBoxVO.getPreText())

@@ -10,10 +10,10 @@ public class TextBoxGraphDeletionService {
     @Autowired
     private DeviceMapper deviceMapper;
 
-    public void delete(String authKey){
+    public void delete(Integer devId){
         //derivation ->btn ->box 순으로 삭제
-        deviceMapper.deleteDerivations(authKey);
-        deviceMapper.deleteButtons(authKey);
-        deviceMapper.deleteTextBoxes(authKey);
+        deviceMapper.deleteDerivations(devId);
+        deviceMapper.deleteButtons(devId);
+        deviceMapper.deleteTextBoxes(devId);
     }
 }

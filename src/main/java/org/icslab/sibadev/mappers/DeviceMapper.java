@@ -20,47 +20,47 @@ import java.util.List;
 @Repository
 public interface DeviceMapper {
 
-    DeviceDTO getDevice(String authKey);
+    DeviceDTO getDevice(Integer devId);
 
     List<DeviceShortDTO> getDevices(Long userId);
 
-    List<BoxDTO> getBoxes(String authKey);
+    List<BoxDTO> getBoxes(Integer devId);
 
-    List<ButtonDTO> getButtons(String authKey);
+    List<ButtonDTO> getButtons(Integer devId);
 
-    List<DerivationDTO> getDerivations(String authKey);
+    List<DerivationDTO> getDerivations(Integer devId);
 
-    List<BtnDerivationJoinVO> getBtnAndDerivation(String authKey);
+    List<BtnDerivationJoinVO> getBtnAndDerivation(Integer devId);
 
-    List<TextBoxVO> getBoxAndDerivation(String authKey);
+    List<TextBoxVO> getBoxAndDerivation(Integer devId);
 
     void createDevice(DeviceDTO deviceDTO);
 
     void updateDevice(DeviceDTO deviceDTO);
 
-    void deleteTextBoxes(String authKey);
+    void deleteTextBoxes(Integer devId);
 
-    void deleteDerivations(String authKey);
+    void deleteDerivations(Integer devId);
 
-    void deleteButtons(String authKey);
+    void deleteButtons(Integer devId);
 
     void insertTextBoxes(
             @Param("textBoxDTOList")
             List<TextBoxDTO> textBoxDTOList,
-            @Param("authKey")
-            String authKey);
+            @Param("devId")
+            Integer devId);
 
     void insertButtons(
             @Param("buttonDTOList")
             List<ButtonWrapperDTO> buttonDTOList,
-            @Param("authKey")
-            String authKey);
+            @Param("devId")
+            Integer devId);
 
     void insertLinkers(
             @Param("linkerDTOList")
             List<LinkerDTO> linkerDTOList,
-            @Param("authKey")
-            String authKey);
+            @Param("devId")
+            Integer devId);
 
     //void multipleTableMultipleInsert();
 }

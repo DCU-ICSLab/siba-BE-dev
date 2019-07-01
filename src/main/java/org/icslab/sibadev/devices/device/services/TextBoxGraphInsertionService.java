@@ -23,35 +23,35 @@ public class TextBoxGraphInsertionService {
     TextBoxGraphDeletionService textBoxGraphDeletionService;
 
     @Transactional(rollbackFor = Exception.class)
-    public void insertion(TextBoxGraphDTO textBoxGraphDTO){
+    public void insertion(TextBoxGraphDTO textBoxGraphDTO) {
+        textBoxGraphDeletionService.delete(textBoxGraphDTO.getDevId());
 
-        textBoxGraphDeletionService.delete(textBoxGraphDTO.getDevAuthKey());
-
-        //dev의 box_id_cnt, code_cnt, have_entry update
-        deviceMapper.updateDevice(
-            DeviceDTO.builder()
+        DeviceDTO deviceDTO = DeviceDTO.builder()
+                .devId(textBoxGraphDTO.getDevId())
                 .authKey(textBoxGraphDTO.getDevAuthKey())
                 .boxIdCnt(textBoxGraphDTO.getBlockIdCounter())
                 .codeCnt(textBoxGraphDTO.getCodeIdCounter())
                 .evCodeCnt(textBoxGraphDTO.getEventCodeIdCounter())
                 .haveEntry(textBoxGraphDTO.getHaveEntry())
-                .build()
-        );
+                .build();
+
+        //dev의 box_id_cnt, code_cnt, have_entry update
+        deviceMapper.updateDevice(deviceDTO);
 
         //box ->btn ->derivation 순으로 삽입
         this.multipleTableMultipleInsert(textBoxGraphDTO);
     }
 
-    private void multipleTableMultipleInsert(TextBoxGraphDTO textBoxGraphDTO){
-        deviceMapper.insertTextBoxes(textBoxGraphDTO.getPallet(), textBoxGraphDTO.getDevAuthKey());
-        deviceMapper.insertButtons(this.getAllButtons(textBoxGraphDTO), textBoxGraphDTO.getDevAuthKey());
-        deviceMapper.insertLinkers(textBoxGraphDTO.getLinkers(), textBoxGraphDTO.getDevAuthKey());
+    private void multipleTableMultipleInsert(TextBoxGraphDTO textBoxGraphDTO) {
+        deviceMapper.insertTextBoxes(textBoxGraphDTO.getPallet(), textBoxGraphDTO.getDevId());
+        deviceMapper.insertButtons(this.getAllButtons(textBoxGraphDTO), textBoxGraphDTO.getDevId());
+        deviceMapper.insertLinkers(textBoxGraphDTO.getLinkers(), textBoxGraphDTO.getDevId());
     }
 
-    private List<ButtonWrapperDTO> getAllButtons(TextBoxGraphDTO textBoxGraphDTO){
+    private List<ButtonWrapperDTO> getAllButtons(TextBoxGraphDTO textBoxGraphDTO) {
         List<ButtonWrapperDTO> list = new ArrayList<>();
-        for(TextBoxDTO box : textBoxGraphDTO.getPallet()){
-            for(ButtonDTO button : box.getInfo().getButtons()){
+        for (TextBoxDTO box : textBoxGraphDTO.getPallet()) {
+            for (ButtonDTO button : box.getInfo().getButtons()) {
                 list.add(ButtonWrapperDTO.builder()
                         .boxId(box.getId())
                         .buttonDTO(button)

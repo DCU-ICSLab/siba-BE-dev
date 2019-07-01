@@ -29,14 +29,14 @@ public class TextBoxGraphGenerateService {
         }
     }
 
-    public TextBoxGraphDTO generate(String authKey) {
+    public TextBoxGraphDTO generate(Integer devId) {
 
         //device information
-        DeviceDTO deviceDTO = deviceMapper.getDevice(authKey);
+        DeviceDTO deviceDTO = deviceMapper.getDevice(devId);
 
         //source
-        List<TextBoxVO> textBoxVOList = deviceMapper.getBoxAndDerivation(authKey);
-        List<BtnDerivationJoinVO> btnDerivationJoinVOList = deviceMapper.getBtnAndDerivation(authKey);
+        List<TextBoxVO> textBoxVOList = deviceMapper.getBoxAndDerivation(devId);
+        List<BtnDerivationJoinVO> btnDerivationJoinVOList = deviceMapper.getBtnAndDerivation(devId);
 
         //target
         List<TextBoxDTO> textBoxDTOList = new ArrayList<>();
@@ -77,6 +77,7 @@ public class TextBoxGraphGenerateService {
         }
 
         return TextBoxGraphDTO.builder()
+                .devId(deviceDTO.getDevId())
                 .devAuthKey(deviceDTO.getAuthKey())
                 .vHubId(deviceDTO.getVHubId())
                 .devName(deviceDTO.getDevName())

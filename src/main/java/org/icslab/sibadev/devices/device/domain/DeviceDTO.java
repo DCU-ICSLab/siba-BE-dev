@@ -15,6 +15,8 @@ public class DeviceDTO {
     @JsonProperty(value = "vHubId")
     private Integer vHubId;
 
+    private Integer devId;
+
     private String devName;
 
     private String devDefName;

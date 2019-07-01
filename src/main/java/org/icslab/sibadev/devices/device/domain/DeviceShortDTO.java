@@ -8,6 +8,8 @@ public class DeviceShortDTO {
 
     private Integer vHubId;
 
+    private Integer devId;
+
     private String devName;
 
     private String devDefName;

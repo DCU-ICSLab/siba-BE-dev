@@ -32,10 +32,10 @@ public class DeviceController {
     @Autowired
     private DeviceMapper deviceMapper;
 
-   @GetMapping("/device/{authKey}")
-    public ResponseDTO getDeviceInformation(@PathVariable String authKey){
+    @GetMapping("/device/{devId}")
+    public ResponseDTO getDeviceInformation(@PathVariable Integer devId){
 
-        TextBoxGraphDTO textBoxGraphDTO = textBoxGraphGenerateService.generate(authKey);
+        TextBoxGraphDTO textBoxGraphDTO = textBoxGraphGenerateService.generate(devId);
         System.out.println(textBoxGraphDTO);
         return ResponseDTO.builder()
                 .msg("textbox graph info")
@@ -63,8 +63,8 @@ public class DeviceController {
                .build();
     }
 
-    @PostMapping("/device/{authKey}")
-    public ResponseDTO saveDeviceInformation(@RequestBody TextBoxGraphDTO textBoxGraphDTO, @PathVariable String authKey){
+    @PostMapping("/device/{devId}")
+    public ResponseDTO saveDeviceInformation(@RequestBody TextBoxGraphDTO textBoxGraphDTO, @PathVariable Integer devId){
         System.out.println(textBoxGraphDTO);
 
         textBoxGraphInsertionService.insertion(textBoxGraphDTO);
@@ -75,9 +75,9 @@ public class DeviceController {
                 .build();
     }
 
-    @PostMapping("/device/{authKey}/deploy")
-    public ResponseDTO saveDeviceInformation(@PathVariable String authKey){
-        return textBoxGraphDeployService.deploy(authKey);
+    @PostMapping("/device/{devId}/deploy")
+    public ResponseDTO saveDeviceInformation(@PathVariable Integer devId){
+        return textBoxGraphDeployService.deploy(devId);
     }
 
     @PostMapping("/device/authkey")

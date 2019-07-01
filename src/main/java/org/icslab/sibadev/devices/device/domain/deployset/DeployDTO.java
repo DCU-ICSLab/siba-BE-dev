@@ -1,6 +1,5 @@
 package org.icslab.sibadev.devices.device.domain.deployset;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;

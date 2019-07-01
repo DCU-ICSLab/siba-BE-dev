@@ -13,6 +13,8 @@ public class TextBoxGraphDTO {
 
     private String devAuthKey;
 
+    private Integer devId;
+
     private String devName;
 
     private int vHubId;

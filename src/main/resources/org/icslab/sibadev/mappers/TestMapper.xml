@@ -12,7 +12,7 @@
                post_text,
                box_type
         FROM box
-        WHERE auth_key = #{authKey} AND box_id = #{boxId}
+        WHERE dev_id = #{devId} AND box_id = #{boxId}
     </select>
 
     <select id="getTextButton" parameterType="java.util.Map" resultMap="TextButton">
@@ -23,8 +23,8 @@
                d.cbox_id
         FROM btn as b
         LEFT OUTER JOIN derivation as d
-        ON b.auth_key = d.auth_key AND b.btn_code = d.btn_code
-        WHERE b.auth_key= #{authKey} AND b.box_id = #{boxId}
+        ON b.dev_id = d.dev_id AND b.btn_code = d.btn_code
+        WHERE b.dev_id= #{devId} AND b.box_id = #{boxId}
     </select>
 
     <!-- <result property="userId" column="user_id"/> -->

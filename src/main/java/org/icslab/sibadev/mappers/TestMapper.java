@@ -13,15 +13,15 @@ import java.util.List;
 public interface TestMapper {
 
     TextBoxVO getTextBox(
-            @Param("authKey")
-            String authKey,
+            @Param("devId")
+            Integer devId,
             @Param("boxId")
             int boxId
     );
 
     List<ButtonVO> getTextButton(
-            @Param("authKey")
-            String authKey,
+            @Param("devId")
+            Integer devId,
             @Param("boxId")
             int boxId
     );

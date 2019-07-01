@@ -5,8 +5,9 @@
 
 <mapper namespace="org.icslab.sibadev.mappers.DeviceMapper">
 
-    <select id="getDevice" resultMap="Device" parameterType="String">
-        SELECT auth_key,
+    <select id="getDevice" resultMap="Device" parameterType="Integer">
+        SELECT dev_id,
+               auth_key,
                vhub_id,
                dev_name,
                dev_def_name,
@@ -17,19 +18,19 @@
                have_entry,
                evcode_cnt
         FROM dev
-        where auth_key=#{authKey}
+        where dev_id=#{devId}
     </select>
 
-    <select id="getBoxes" parameterType="String" resultMap="DeployBox">
+    <select id="getBoxes" parameterType="Integer" resultMap="DeployBox">
         SELECT box_id,
                pre_text,
                post_text,
                box_type
         FROM box
-        WHERE auth_key=#{authKey}
+        WHERE dev_id=#{devId}
     </select>
 
-    <select id="getButtons" parameterType="String" resultMap="DeployButton">
+    <select id="getButtons" parameterType="Integer" resultMap="DeployButton">
         SELECT btn_name,
                btn_code,
                idx,
@@ -38,18 +39,18 @@
                ev_code,
                is_spread
         FROM btn
-        WHERE auth_key=#{authKey}
+        WHERE dev_id=#{devId}
     </select>
 
-    <select id="getDerivations" parameterType="String" resultMap="DeployDerivation">
+    <select id="getDerivations" parameterType="Integer" resultMap="DeployDerivation">
         SELECT btn_code,
                cbox_id,
                pbox_id
         FROM derivation
-        WHERE auth_key=#{authKey}
+        WHERE dev_id=#{devId}
     </select>
 
-    <select id="getBoxAndDerivation" resultMap="TextBox" parameterType="String">
+    <select id="getBoxAndDerivation" resultMap="TextBox" parameterType="Integer">
         SELECT box.box_id,
                box.pre_text,
                box.post_text,
@@ -63,28 +64,11 @@
         FROM box as box
         LEFT OUTER JOIN derivation as d
         on box.box_id = d.cbox_id
-        where box.auth_key=#{authKey}
+        where box.dev_id=#{devId}
         ORDER BY box.box_id;
     </select>
 
-    <select id="getBtnAndDerivation" resultMap="BtnDerivationJoin" parameterType="String">
-        <!--SELECT btn.box_id,
-               btn.btn_code,
-               btn.ev_code,
-               btn.is_spread,
-               btn.idx,
-               btn.btn_name,
-               btn.idx,
-               d.cbox_id,
-               d.mx,
-               d.my,
-               d.zx,
-               d.zy
-        FROM btn as btn, box as box
-        LEFT OUTER JOIN derivation as d
-        ON box.box_id = d.pbox_id
-        WHERE box.auth_key = #{authKey}
-        order by btn.box_id, btn.idx;-->
+    <select id="getBtnAndDerivation" resultMap="BtnDerivationJoin" parameterType="Integer">
         SELECT
         btn.box_id,
         btn.btn_code,
@@ -102,7 +86,7 @@
         btn as btn
         LEFT OUTER JOIN derivation as d
         ON btn.btn_code = d.btn_code
-        where btn.auth_key=#{authKey}
+        where btn.dev_id=#{devId}
         order by btn.box_id, btn.idx;
     </select>
 
@@ -110,6 +94,7 @@
     <select id="getDevices" resultMap="DeviceSummary" parameterType="Long">
         SELECT v.vhub_id,
                d.auth_key,
+               d.dev_id,
                d.dev_name,
                d.dev_def_name,
                d.dev_type,
@@ -126,27 +111,28 @@
             code_cnt=#{codeCnt},
             have_entry=#{haveEntry},
             evcode_cnt=#{evCodeCnt}
-        WHERE auth_key=#{authKey}
+        WHERE dev_id=#{devId}
     </update>
 
-    <delete id="deleteTextBoxes" parameterType="String">
+    <delete id="deleteTextBoxes" parameterType="Integer">
         delete from box
-        where auth_key=#{authKey}
+        where dev_id=#{devId}
     </delete>
 
-    <delete id="deleteDerivations" parameterType="String">
+    <delete id="deleteDerivations" parameterType="Integer">
         delete from derivation
-        where auth_key=#{authKey}
+        where dev_id=#{devId}
     </delete>
 
-    <delete id="deleteButtons" parameterType="String">
+    <delete id="deleteButtons" parameterType="Integer">
         delete from btn
-        where auth_key=#{authKey}
+        where dev_id=#{devId}
     </delete>
 
     <insert id="createDevice" parameterType="org.icslab.sibadev.devices.device.domain.DeviceDTO">
-        insert into dev(auth_key, dev_name, dev_def_name, dev_type, category, vhub_id, box_id_cnt, code_cnt, have_entry, evcode_cnt)
+        insert into dev(dev_id, auth_key, dev_name, dev_def_name, dev_type, category, vhub_id, box_id_cnt, code_cnt, have_entry, evcode_cnt)
         values (
+          NEXTVAL(dev_sequence),
           #{authKey},
           #{devName},
           #{devDefName},
@@ -162,14 +148,14 @@
 
     <!--text box set insertion-->
     <insert id="insertTextBoxes" parameterType="java.util.Map">
-        insert into box(box_id, pre_text, post_text, auth_key, box_type, xaxis, yaxis, head_row, foot_row)
+        insert into box(box_id, pre_text, post_text, dev_id, box_type, xaxis, yaxis, head_row, foot_row)
         values
         <foreach collection="textBoxDTOList" item="item" separator=" , ">
             (
               #{item.id},
               #{item.preorder},
               #{item.postorder},
-              #{authKey},
+              #{devId},
               #{item.type},
               #{item.pos.x},
               #{item.pos.y},
@@ -181,7 +167,7 @@
 
     <!--button set insertion-->
     <insert id="insertButtons" parameterType="java.util.Map">
-        insert into btn(btn_name, btn_code, idx, box_id, ev_code, is_spread, btn_type, auth_key)
+        insert into btn(btn_name, btn_code, idx, box_id, ev_code, is_spread, btn_type, dev_id)
         values
         <foreach collection="buttonDTOList" item="item" separator=" , ">
             (
@@ -192,14 +178,14 @@
             #{item.buttonDTO.eventCode},
             #{item.buttonDTO.isSpread},
             #{item.buttonDTO.type},
-            #{authKey}
+            #{devId}
             )
         </foreach>
     </insert>
 
     <!--linker set insertion-->
     <insert id="insertLinkers" parameterType="java.util.Map">
-        insert into derivation(mx, my, zx, zy, btn_code, cbox_id, pbox_id, auth_key)
+        insert into derivation(mx, my, zx, zy, btn_code, cbox_id, pbox_id, dev_id)
         values
         <foreach collection="linkerDTOList" item="item" separator=" , ">
             (
@@ -210,13 +196,14 @@
             #{item.code},
             #{item.childId},
             #{item.parentId},
-            #{authKey}
+            #{devId}
             )
         </foreach>
     </insert>
 
     <resultMap id="DeviceSummary" type="org.icslab.sibadev.devices.device.domain.DeviceShortDTO">
         <result property="vHubId" column="vhub_id"/>
+        <result property="devId" column="dev_id"/>
         <result property="authKey" column="auth_key"/>
         <result property="devName" column="dev_name"/>
         <result property="devDefName" column="dev_def_name"/>
@@ -225,6 +212,7 @@
     </resultMap>
 
     <resultMap id="Device" type="org.icslab.sibadev.devices.device.domain.DeviceDTO">
+        <result property="devId" column="dev_id"/>
         <result property="authKey" column="auth_key"/>
         <result property="devName" column="dev_name"/>
         <result property="devDefName" column="dev_def_name"/>
