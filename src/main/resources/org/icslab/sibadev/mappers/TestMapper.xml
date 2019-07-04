@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.icslab.sibadev.mappers.TestMapper">
+
+    <!-- userId를 이용하여 userinfo get -->
+    <select id="getTextBox" parameterType="java.util.Map" resultMap="TextBox">
+        SELECT box_id,
+               pre_text,
+               post_text,
+               box_type
+        FROM box
+        WHERE dev_id = #{devId} AND box_id = #{boxId}
+    </select>
+
+    <select id="getTextButton" parameterType="java.util.Map" resultMap="TextButton">
+        SELECT b.btn_code,
+               b.btn_name,
+               b.ev_code,
+               b.btn_type,
+               d.cbox_id
+        FROM btn as b
+        LEFT OUTER JOIN derivation as d
+        ON b.dev_id = d.dev_id AND b.btn_code = d.btn_code
+        WHERE b.dev_id= #{devId} AND b.box_id = #{boxId}
+    </select>
+
+    <!-- <result property="userId" column="user_id"/> -->
+    <resultMap id="TextBox" type="org.icslab.sibadev.devices.test.domain.TextBoxVO">
+        <result property="boxId" column="box_id"/>
+        <result property="preText" column="pre_text"/>
+        <result property="postText" column="post_text"/>
+        <result property="boxType" column="box_type"/>
+    </resultMap>
+
+    <resultMap id="TextButton" type="org.icslab.sibadev.devices.test.domain.ButtonVO">
+        <result property="btnCode" column="btn_code"/>
+        <result property="btnName" column="btn_name"/>
+        <result property="evCode" column="ev_code"/>
+        <result property="btnType" column="btn_type"/>
+        <result property="cboxId" column="cbox_id"/>
+    </resultMap>
+</mapper>
