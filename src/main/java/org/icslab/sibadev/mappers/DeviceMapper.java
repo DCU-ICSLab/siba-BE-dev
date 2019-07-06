@@ -22,7 +22,9 @@ public interface DeviceMapper {
 
     DeviceDTO getDevice(Integer devId);
 
-    List<DeviceShortDTO> getDevices(Long userId);
+    List<DeviceShortDTO> getDeviceAndHub(Long userId);
+
+    List<DeviceDTO> getDevices(Long userId);
 
     List<BoxDTO> getBoxes(Integer devId);
 

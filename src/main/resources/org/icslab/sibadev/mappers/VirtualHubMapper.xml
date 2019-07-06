@@ -7,8 +7,28 @@
 
 
     <!-- userId를 이용하여 userinfo get -->
-    <insert id="createHub" parameterType="Long">
-        INSERT INTO vhub (vhub_id, users_id) VALUE (NEXTVAL(vhub_sequence),#{userId})
+    <insert id="createHub" parameterType="java.util.Map">
+        INSERT INTO vhub (
+        vhub_id,
+        users_id,
+        hub_key,
+        hub_name,
+        hub_status,
+        hub_ip,
+        hub_port,
+        hub_type
+        )
+        VALUE
+        (
+        NEXTVAL(vhub_sequence),
+        #{userId},
+        #{hub.hubKey},
+        #{hub.hubName},
+        #{hub.hubStatus},
+        #{hub.hubIp},
+        #{hub.hubPort},
+        #{hub.hubType}
+        )
     </insert>
 
 </mapper>

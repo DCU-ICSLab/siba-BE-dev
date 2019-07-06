@@ -1,5 +1,6 @@
 package org.icslab.sibadev.devices.device.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -9,6 +10,9 @@ import lombok.*;
 @Builder
 @ToString
 public class DeviceDTO {
+
+    @JsonIgnore
+    private Long userId;
 
     private String authKey;
 

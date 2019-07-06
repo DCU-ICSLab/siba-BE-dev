@@ -91,8 +91,14 @@
     </select>
 
     <!-- userId를 이용하여 userinfo get -->
-    <select id="getDevices" resultMap="DeviceSummary" parameterType="Long">
+    <select id="getDeviceAndHub" resultMap="DeviceSummary" parameterType="Long">
         SELECT v.vhub_id,
+               v.hub_key,
+               v.hub_name,
+               v.hub_status,
+               v.hub_ip,
+               v.hub_port,
+               v.hub_type,
                d.auth_key,
                d.dev_id,
                d.dev_name,
@@ -103,6 +109,18 @@
         LEFT OUTER JOIN dev as d
         ON v.vhub_id = d.vhub_id
         WHERE v.users_id = #{userId};
+    </select>
+
+    <select id="getDevices" resultMap="Device" parameterType="Long">
+        SELECT dev_id,
+               auth_key,
+               vhub_id,
+               dev_name,
+               dev_def_name,
+               dev_type,
+               category
+        FROM dev
+        WHERE users_id = #{userId};
     </select>
     
     <update id="updateDevice" parameterType="org.icslab.sibadev.devices.device.domain.DeviceDTO">
@@ -130,15 +148,16 @@
     </delete>
 
     <insert id="createDevice" parameterType="org.icslab.sibadev.devices.device.domain.DeviceDTO">
-        insert into dev(dev_id, auth_key, dev_name, dev_def_name, dev_type, category, vhub_id, box_id_cnt, code_cnt, have_entry, evcode_cnt)
+        insert into dev(users_id, dev_id, auth_key, dev_name, dev_def_name, dev_type, category, vhub_id, box_id_cnt, code_cnt, have_entry, evcode_cnt)
         values (
+          #{userId},
           NEXTVAL(dev_sequence),
           #{authKey},
           #{devName},
           #{devDefName},
           #{devType},
           #{category},
-          #{vHubId},
+          null,
           #{boxIdCnt},
           #{codeCnt},
           #{haveEntry},
@@ -203,6 +222,12 @@
 
     <resultMap id="DeviceSummary" type="org.icslab.sibadev.devices.device.domain.DeviceShortDTO">
         <result property="vHubId" column="vhub_id"/>
+        <result property="hubKey" column="hub_key"/>
+        <result property="hubName" column="hub_name"/>
+        <result property="hubStatus" column="hub_status"/>
+        <result property="hubIp" column="hub_ip"/>
+        <result property="hubPort" column="hub_port"/>
+        <result property="hubType" column="hub_type"/>
         <result property="devId" column="dev_id"/>
         <result property="authKey" column="auth_key"/>
         <result property="devName" column="dev_name"/>
