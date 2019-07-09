@@ -5,6 +5,9 @@
 
 <mapper namespace="org.icslab.sibadev.mappers.VirtualHubMapper">
 
+    <select id="getHubOwner" parameterType="String" resultMap="VirtualHubVO">
+      SELECT users_id, hub_name FROM vhub WHERE hub_key=#{hubKey}
+    </select>
 
     <!-- userId를 이용하여 userinfo get -->
     <insert id="createHub" parameterType="java.util.Map">
@@ -30,5 +33,12 @@
         #{hub.hubType}
         )
     </insert>
+
+    <resultMap id="VirtualHubVO" type="org.icslab.sibadev.devices.vhub.domain.VirtualHubVO">
+        <constructor>
+            <arg name="hubName" column="hub_name" javaType="String"></arg>
+            <arg name="userId" column="users_id" javaType="Integer"></arg>
+        </constructor>
+    </resultMap>
 
 </mapper>

@@ -12,12 +12,13 @@ public class BroadcastMessageConsumer {
     @Autowired
     private VirtualHubKeepAliveService virtualHubKeepAliveService;
 
+
     @RabbitListener(queues = {RabbitMQConstants.KEEP_ALIVE_QUEUE})
     public void keepAlive(final KeepAliveMessage message) {
 
         //Entity chargeOrder = MapperUtil.writeStringAsObject(message, Entity.class);
-        virtualHubKeepAliveService.keep();
-        System.out.println(message);
+        virtualHubKeepAliveService.keep(message.getId());
+        System.out.println(message.getId());
 
     }
 }

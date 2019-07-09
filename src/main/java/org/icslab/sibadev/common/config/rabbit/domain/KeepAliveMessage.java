@@ -8,18 +8,13 @@ import java.io.Serializable;
 @ToString
 public final class KeepAliveMessage implements Serializable {
 
-    private final int id;
+    private final String id;
 
-    public KeepAliveMessage(@JsonProperty("id") int id){
+    public KeepAliveMessage(@JsonProperty("id") String id){
         this.id=id;
     }
 
-    public int getId(){
+    public String getId(){
         return id;
     }
-
-    /*@Override
-    public String toString(){
-        return "KeepAliveMessage{id="+id+"}";
-    }*/
 }
