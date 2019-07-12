@@ -1,6 +1,8 @@
 package org.icslab.sibadev.common.config.redis;
 
 import org.icslab.sibadev.common.config.websocket.services.SendToClientService;
+import org.icslab.sibadev.devices.vhub.domain.VirtualHubVO;
+import org.icslab.sibadev.mappers.CLogMapper;
 import org.icslab.sibadev.mappers.VirtualHubMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +27,9 @@ public class RedisConfig{
 
     @Autowired
     private VirtualHubMapper virtualHubMapper;
+
+    @Autowired
+    private CLogMapper cLogMapper;
 
     @Value("${spring.redis.host}")
     private String host;
@@ -54,7 +59,12 @@ public class RedisConfig{
 
         listenerContainer.setConnectionFactory(lettuceConnectionFactory);
         listenerContainer.addMessageListener((message, pattern) -> {
-            sendToClientService.sendToReactClient(virtualHubMapper.getHubOwner(message.toString()),0);
+
+            VirtualHubVO virtualHubVO = virtualHubMapper.getHubOwner(message.toString());
+
+            sendToClientService.sendToReactClient(virtualHubVO,0);
+            virtualHubMapper.updateHubStatus(message.toString(), false); //허브 상태 갱신
+            cLogMapper.insertCLog(virtualHubVO.getUserId(),"2");
             System.out.println("expire");
             //System.out.println(message);
             // event handling comes here

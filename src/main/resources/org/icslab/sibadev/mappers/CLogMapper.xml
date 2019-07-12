@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.icslab.sibadev.mappers.CLogMapper">
+
+    <select id="selectCLogs" parameterType="Long" resultMap="CLogVO">
+      SELECT
+        c.vhub_id,
+        c.act_time,
+        c.msg_type
+      FROM clog as c, vhub as v
+      WHERE v.users_id=#{userId} AND v.vhub_id=c.vhub_id
+      ORDER BY c.act_time
+    </select>
+
+    <insert id="insertCLog" parameterType="java.util.Map">
+        INSERT INTO clog (
+        vhub_id,
+        act_time,
+        msg_type
+        )
+        VALUE
+        (
+        #{vhubId},
+        CURRENT_TIMESTAMP(2),
+        #{msgType}
+        )
+    </insert>
+
+    <update id="updateHubStatus" parameterType="java.util.Map">
+        update vhub set hub_status=#{status}  where hub_key=#{hubKey};
+    </update>
+
+    <resultMap id="CLogVO" type="org.icslab.sibadev.clog.domain.CLogVO">
+        <constructor>
+            <arg name="actTime" column="act_time" javaType="java.sql.Timestamp"></arg>
+            <arg name="messageType" column="msg_type" javaType="String"></arg>
+            <arg name="hubId" column="vhub_id" javaType="Integer"></arg>
+        </constructor>
+    </resultMap>
+
+</mapper>

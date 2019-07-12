@@ -7,11 +7,14 @@ import java.io.Serializable;
 @ToString
 public final class KeepAliveClientMessage implements Serializable {
 
+    private final int hubId;
+
     private final String hubName;
 
     private final int msgType;
 
-    public KeepAliveClientMessage(String hubName, int msgType){
+    public KeepAliveClientMessage(String hubName, int msgType, int hubId){
+        this.hubId=hubId;
         this.hubName=hubName;
         this.msgType=msgType;
     }
@@ -22,5 +25,9 @@ public final class KeepAliveClientMessage implements Serializable {
 
     public String getHubName() {
         return hubName;
+    }
+
+    public int getHubId() {
+        return hubId;
     }
 }

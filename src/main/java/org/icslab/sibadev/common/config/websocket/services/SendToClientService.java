@@ -15,6 +15,10 @@ public class SendToClientService{
     public void sendToReactClient(VirtualHubVO virtualHubVO, int messageType){
         System.out.println("send to client: "+virtualHubVO.getUserId());
         simpMessagingTemplate.convertAndSend("/topic/keep-alive-"+virtualHubVO.getUserId()
-                , new KeepAliveClientMessage(virtualHubVO.getHubName(), messageType));
+                , new KeepAliveClientMessage(
+                        virtualHubVO.getHubName(),
+                        messageType,
+                        virtualHubVO.getHubId()
+                ));
     }
 }

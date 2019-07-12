@@ -10,4 +10,6 @@ public class VirtualHubVO {
     String hubName;
 
     Integer userId;
+
+    Integer hubId;
 }

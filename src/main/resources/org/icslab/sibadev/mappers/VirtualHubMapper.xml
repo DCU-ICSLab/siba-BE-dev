@@ -5,12 +5,23 @@
 
 <mapper namespace="org.icslab.sibadev.mappers.VirtualHubMapper">
 
+    <update id="updateDeviceUnlink" parameterType="Integer">
+        update dev set vhub_id=NULL where dev_id=#{devId};
+    </update>
+
+    <update id="updateDeviceLinkHub" parameterType="java.util.Map">
+        update dev set vhub_id=#{vhubId} where dev_id=#{devId};
+    </update>
+
     <select id="getHubOwner" parameterType="String" resultMap="VirtualHubVO">
-      SELECT users_id, hub_name FROM vhub WHERE hub_key=#{hubKey}
+      SELECT users_id, hub_name, vhub_id FROM vhub WHERE hub_key=#{hubKey}
     </select>
 
     <!-- userId를 이용하여 userinfo get -->
     <insert id="createHub" parameterType="java.util.Map">
+        <selectKey keyProperty="vhubId" resultType="int" order="BEFORE">
+            select NEXTVAL(vhub_sequence)
+        </selectKey>
         INSERT INTO vhub (
         vhub_id,
         users_id,
@@ -23,7 +34,7 @@
         )
         VALUE
         (
-        NEXTVAL(vhub_sequence),
+        #{vhubId},
         #{userId},
         #{hub.hubKey},
         #{hub.hubName},
@@ -33,11 +44,16 @@
         #{hub.hubType}
         )
     </insert>
+    
+    <update id="updateHubStatus" parameterType="java.util.Map">
+        update vhub set hub_status=#{status}  where hub_key=#{hubKey};
+    </update>
 
     <resultMap id="VirtualHubVO" type="org.icslab.sibadev.devices.vhub.domain.VirtualHubVO">
         <constructor>
             <arg name="hubName" column="hub_name" javaType="String"></arg>
             <arg name="userId" column="users_id" javaType="Integer"></arg>
+            <arg name="hubId" column="vhub_id" javaType="Integer"></arg>
         </constructor>
     </resultMap>
 
