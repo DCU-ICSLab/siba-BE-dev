@@ -20,12 +20,12 @@ public class KeepAliveRepository {
 
     //상태 추가
     public void save(String hubAuthKey, Boolean status){
-        valueOperations.set(hubAuthKey, status, 5L, TimeUnit.SECONDS);
+        valueOperations.set(hubAuthKey, status, 6L, TimeUnit.SECONDS);
     }
 
     //상태 갱신
     public void update(String hubAuthKey, Boolean status){
-        valueOperations.set(hubAuthKey, status, 5L, TimeUnit.SECONDS);
+        valueOperations.set(hubAuthKey, status, 6L, TimeUnit.SECONDS);
     }
 
     //상태 조회

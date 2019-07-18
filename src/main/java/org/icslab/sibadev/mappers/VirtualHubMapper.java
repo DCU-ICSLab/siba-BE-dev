@@ -17,6 +17,13 @@ public interface VirtualHubMapper {
 
     VirtualHubVO getHubOwner(String hubKey);
 
+    void establishHub(
+            @Param("hubKey") String hubKey,
+            @Param("hubIp") String hubIp,
+            @Param("hubPort") Integer hubPort,
+            @Param("status") Boolean status
+    );
+
     void updateHubStatus(@Param("hubKey") String hubKey, @Param("status") Boolean status);
 
     void updateDeviceUnlink(Integer devId);

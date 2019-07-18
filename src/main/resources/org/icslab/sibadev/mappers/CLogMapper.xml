@@ -12,7 +12,7 @@
         c.msg_type
       FROM clog as c, vhub as v
       WHERE v.users_id=#{userId} AND v.vhub_id=c.vhub_id
-      ORDER BY c.act_time
+      ORDER BY c.act_time DESC
     </select>
 
     <insert id="insertCLog" parameterType="java.util.Map">

@@ -16,34 +16,58 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     @Bean
-    Queue queue() {
+    Queue keepAliveQueue() {
         return new Queue(RabbitMQConstants.KEEP_ALIVE_QUEUE, false);
     }
 
     @Bean
-    TopicExchange topicExchange() {
+    Queue establishQueue() {
+        return new Queue(RabbitMQConstants.ESTABLISH_QUEUE, false);
+    }
+
+    @Bean
+    Queue deviceEstablishQueue() {
+        return new Queue(RabbitMQConstants.DEVICE_ESTABLISH_QUEUE, false);
+    }
+
+    @Bean
+    TopicExchange keepAliveTopicExchange() {
         return new TopicExchange(RabbitMQConstants.KEEP_ALIVE_EXCHANGE);
     }
 
     @Bean
-    Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(RabbitMQConstants.KEEP_ALIVE_ROUTE_KEY);
-    }
-
-    /*@Bean
-    SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter)
-    {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(RabbitMQConstants.KEEP_ALIVE_QUEUE);
-        container.setMessageListener(listenerAdapter);
-        return container;
+    TopicExchange establishExchange() {
+        return new TopicExchange(RabbitMQConstants.ESTABLISH_EXCHANGE);
     }
 
     @Bean
-    MessageListenerAdapter listenerAdapter(BroadcastMessageConsumer receiver) {
-        return new MessageListenerAdapter(receiver, "keepAlive");
-    }*/
+    TopicExchange deviceEstablishExchange() {
+        return new TopicExchange(RabbitMQConstants.DEVICE_ESTABLISH_EXCHANGE);
+    }
+
+    @Bean
+    Binding bindingKeepAlive(Queue keepAliveQueue, TopicExchange keepAliveTopicExchange) {
+        return BindingBuilder
+                .bind(keepAliveQueue)
+                .to(keepAliveTopicExchange)
+                .with(RabbitMQConstants.KEEP_ALIVE_ROUTE_KEY);
+    }
+
+    @Bean
+    Binding bindingEstablish(Queue establishQueue, TopicExchange establishExchange) {
+        return BindingBuilder
+                .bind(establishQueue)
+                .to(establishExchange)
+                .with(RabbitMQConstants.ESTABLISH_ROUTE_KEY);
+    }
+
+    @Bean
+    Binding bindingDeviceEstablish(Queue deviceEstablishQueue, TopicExchange deviceEstablishExchange) {
+        return BindingBuilder
+                .bind(deviceEstablishQueue)
+                .to(deviceEstablishExchange)
+                .with(RabbitMQConstants.DEVICE_ESTABLISH_ROUTE_KEY);
+    }
 
     @Bean
     public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {

@@ -25,13 +25,19 @@ public class VirtualHubKeepAliveService {
 
     public void keep(String hubAuthKey){
 
+        //hubAuthKey가 Null이라면 수행중지
+        if(hubAuthKey==null){
+            return;
+        }
+
         //해당 hubAuthKey가 in-memory에 존재 하는 경우 유효 시간 갱신 작업 수행
         if(keepAliveRepository.find(hubAuthKey)!=null){
+            System.out.println("[update]: "+hubAuthKey);
             keepAliveRepository.update(hubAuthKey, true);
         }
 
         //해당 hubAuthKey가 in-memory에 존재 하지 않는 경우, 허브 연결
-        else{
+        /*else{
             VirtualHubVO virtualHubVO= virtualHubMapper.getHubOwner(hubAuthKey);
 
             //인증키가 DB에 존재하지 않는다면 수행하지 않는다.
@@ -41,6 +47,6 @@ public class VirtualHubKeepAliveService {
                 virtualHubMapper.updateHubStatus(hubAuthKey, true); //허브 상태 갱신
                 cLogMapper.insertCLog(virtualHubVO.getUserId(), "1");
             }
-        }
+        }*/
     }
 }

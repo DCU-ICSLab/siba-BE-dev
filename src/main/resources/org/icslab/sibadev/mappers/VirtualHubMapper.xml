@@ -5,6 +5,15 @@
 
 <mapper namespace="org.icslab.sibadev.mappers.VirtualHubMapper">
 
+    <update id="establishHub" parameterType="java.util.Map">
+        update vhub
+        set
+        hub_status=#{status},
+        hub_ip=#{hubIp},
+        hub_port=#{hubPort}
+        where hub_key=#{hubKey};
+    </update>
+
     <update id="updateDeviceUnlink" parameterType="Integer">
         update dev set vhub_id=NULL where dev_id=#{devId};
     </update>

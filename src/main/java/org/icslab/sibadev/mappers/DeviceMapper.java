@@ -22,6 +22,8 @@ public interface DeviceMapper {
 
     DeviceDTO getDevice(Integer devId);
 
+    Integer getRepositoryOwner(String devKey);
+
     List<DeviceShortDTO> getDeviceAndHub(Long userId);
 
     List<DeviceDTO> getDevices(Long userId);

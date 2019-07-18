@@ -5,6 +5,10 @@
 
 <mapper namespace="org.icslab.sibadev.mappers.DeviceMapper">
 
+    <select id="getRepositoryOwner" resultType="Integer" parameterType="String">
+      SELECT users_id FROM dev where auth_key=#{devKey}
+    </select>
+
     <select id="getDevice" resultMap="Device" parameterType="Integer">
         SELECT dev_id,
                auth_key,
