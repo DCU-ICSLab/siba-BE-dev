@@ -14,13 +14,13 @@ public class DeviceEstablishService {
     @Autowired
     SendToClientService sendToClientService;
 
-    public void establish(String devAuthKey, String mac){
+    public void establish(String devAuthKey, String mac, int msgType){
 
         Integer userId = deviceMapper.getRepositoryOwner(devAuthKey);
 
         //인증키가 DB에 존재하지 않는다면 수행하지 않는다.
         if(userId!=null) {
-            sendToClientService.sendToReactClient(mac, 1, userId);
+            sendToClientService.sendToReactClient(mac, msgType, userId);
         }
     }
 }

@@ -26,6 +26,10 @@
       SELECT users_id, hub_name, vhub_id FROM vhub WHERE hub_key=#{hubKey}
     </select>
 
+    <select id="getVirtualHubHostInfo" parameterType="Integer" resultMap="VirtualHubHostVO">
+        SELECT hub_ip, hub_port FROM vhub WHERE vhub_id=#{vhubId}
+    </select>
+
     <!-- userId를 이용하여 userinfo get -->
     <insert id="createHub" parameterType="java.util.Map">
         <selectKey keyProperty="vhubId" resultType="int" order="BEFORE">
@@ -58,11 +62,26 @@
         update vhub set hub_status=#{status}  where hub_key=#{hubKey};
     </update>
 
+    <update id="unlinkAllHub">
+        update vhub set hub_status=0
+    </update>
+
+    <select id="getAllLinkedRepoId" parameterType="Integer" resultType="Integer">
+        SELECT dev_id FROM dev WHERE vhub_id=#{hubId}
+    </select>
+
     <resultMap id="VirtualHubVO" type="org.icslab.sibadev.devices.vhub.domain.VirtualHubVO">
         <constructor>
             <arg name="hubName" column="hub_name" javaType="String"></arg>
             <arg name="userId" column="users_id" javaType="Integer"></arg>
             <arg name="hubId" column="vhub_id" javaType="Integer"></arg>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="VirtualHubHostVO" type="org.icslab.sibadev.devices.vhub.domain.VirtualHubHostVO">
+        <constructor>
+            <arg name="host" column="hub_ip" javaType="String"></arg>
+            <arg name="port" column="hub_port" javaType="Integer"></arg>
         </constructor>
     </resultMap>
 

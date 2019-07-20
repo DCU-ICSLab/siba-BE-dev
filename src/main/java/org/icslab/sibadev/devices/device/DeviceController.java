@@ -3,6 +3,7 @@ package org.icslab.sibadev.devices.device;
 import lombok.extern.slf4j.Slf4j;
 import org.icslab.sibadev.common.config.security.oauth2.UserPrincipal;
 import org.icslab.sibadev.common.domain.response.ResponseDTO;
+import org.icslab.sibadev.devices.device.domain.ConnectedDeviceVO;
 import org.icslab.sibadev.devices.device.domain.DeviceDTO;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.TextBoxGraphDTO;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphDeployService;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -91,6 +94,18 @@ public class DeviceController {
                 .msg("device authentication key")
                 .status(HttpStatus.OK)
                 .data(uniqueKeyGenService.generate())
+                .build();
+    }
+
+    @GetMapping("/device/{devId}/conndev")
+    public ResponseDTO getConnectedDevInfo(@PathVariable Integer devId) {
+
+        List<ConnectedDeviceVO> connectedDeviceVOS = deviceMapper.getConnectedDeviceInfo(devId);
+
+        return ResponseDTO.builder()
+                .msg("connected device list")
+                .status(HttpStatus.OK)
+                .data(connectedDeviceVOS)
                 .build();
     }
 }

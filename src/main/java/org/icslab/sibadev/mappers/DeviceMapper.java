@@ -2,10 +2,7 @@ package org.icslab.sibadev.mappers;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.icslab.sibadev.devices.device.domain.BtnDerivationJoinVO;
-import org.icslab.sibadev.devices.device.domain.DeviceDTO;
-import org.icslab.sibadev.devices.device.domain.DeviceShortDTO;
-import org.icslab.sibadev.devices.device.domain.TextBoxVO;
+import org.icslab.sibadev.devices.device.domain.*;
 import org.icslab.sibadev.devices.device.domain.deployset.BoxDTO;
 import org.icslab.sibadev.devices.device.domain.deployset.ButtonDTO;
 import org.icslab.sibadev.devices.device.domain.deployset.DerivationDTO;
@@ -38,6 +35,8 @@ public interface DeviceMapper {
 
     List<TextBoxVO> getBoxAndDerivation(Integer devId);
 
+    List<ConnectedDeviceVO> getConnectedDeviceInfo(Integer devId);
+
     void createDevice(DeviceDTO deviceDTO);
 
     void updateDevice(DeviceDTO deviceDTO);
@@ -47,6 +46,16 @@ public interface DeviceMapper {
     void deleteDerivations(Integer devId);
 
     void deleteButtons(Integer devId);
+
+    void deleteConnectedDevice(String devMac);
+
+    void deleteConnectedDeviceById(Integer devId);
+
+    void clearAllConnectedDevice();
+
+    void createConnectedDevice(@Param("devId") Integer devId, @Param("devMac") String devMac);
+
+    Integer findDevId(String devKey);
 
     void insertTextBoxes(
             @Param("textBoxDTOList")

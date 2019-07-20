@@ -5,6 +5,14 @@
 
 <mapper namespace="org.icslab.sibadev.mappers.DeviceMapper">
 
+    <select id="findDevId" resultType="Integer" parameterType="String">
+      SELECT dev_id FROM dev where auth_key=#{devKey}
+    </select>
+
+    <select id="getConnectedDeviceInfo" resultMap="ConnectedDeviceVO" parameterType="Integer">
+      SELECT dev_mac, conn_at FROM conn_dev where dev_id=#{devId}
+    </select>
+
     <select id="getRepositoryOwner" resultType="Integer" parameterType="String">
       SELECT users_id FROM dev where auth_key=#{devKey}
     </select>
@@ -224,6 +232,30 @@
         </foreach>
     </insert>
 
+    <insert id="createConnectedDevice" parameterType="java.util.Map">
+        insert into conn_dev(dev_id, dev_mac, conn_at)
+        values
+        (
+          #{devId},
+          #{devMac},
+          CURRENT_TIMESTAMP(2)
+        )
+    </insert>
+
+    <delete id="deleteConnectedDevice" parameterType="String">
+        delete from conn_dev
+        where dev_mac=#{devMac}
+    </delete>
+
+    <delete id="deleteConnectedDeviceById" parameterType="Integer">
+        delete from conn_dev
+        where dev_id=#{devId}
+    </delete>
+
+    <delete id="clearAllConnectedDevice">
+        delete from conn_dev
+    </delete>
+
     <resultMap id="DeviceSummary" type="org.icslab.sibadev.devices.device.domain.DeviceShortDTO">
         <result property="vHubId" column="vhub_id"/>
         <result property="hubKey" column="hub_key"/>
@@ -303,5 +335,12 @@
         <result property="cBoxId" column="cbox_id"/>
         <result property="pBoxId" column="pbox_id"/>
         <result property="btnCode" column="btn_code"/>
+    </resultMap>
+
+    <resultMap id="ConnectedDeviceVO" type="org.icslab.sibadev.devices.device.domain.ConnectedDeviceVO">
+        <constructor>
+            <arg name="devMac" column="dev_mac" javaType="String"></arg>
+            <arg name="connectedAt" column="conn_at" javaType="java.sql.Timestamp"></arg>
+        </constructor>
     </resultMap>
 </mapper>

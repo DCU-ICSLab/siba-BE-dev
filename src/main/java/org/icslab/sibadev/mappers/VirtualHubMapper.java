@@ -2,9 +2,11 @@ package org.icslab.sibadev.mappers;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.icslab.sibadev.devices.vhub.domain.VirtualHubHostVO;
 import org.icslab.sibadev.devices.vhub.domain.VirtualHubVO;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 
 @Mapper
@@ -27,4 +29,10 @@ public interface VirtualHubMapper {
     void updateHubStatus(@Param("hubKey") String hubKey, @Param("status") Boolean status);
 
     void updateDeviceUnlink(Integer devId);
+
+    void unlinkAllHub();
+
+    VirtualHubHostVO getVirtualHubHostInfo(Integer vhubId);
+
+    List<Integer> getAllLinkedRepoId(Integer hubId);
 }

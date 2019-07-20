@@ -27,6 +27,37 @@
         WHERE b.dev_id= #{devId} AND b.box_id = #{boxId}
     </select>
 
+    <insert id="addDeviceTestLog" parameterType="org.icslab.sibadev.devices.test.domain.TestLogDTO">
+        <selectKey keyProperty="testId" resultType="int" order="BEFORE">
+            select NEXTVAL(tlog_sequence)
+        </selectKey>
+        insert into tlog(dev_id, t_id, dev_mac, t_status)
+        values
+        (
+          #{devId},
+          #{testId},
+          #{devMac},
+          #{testStatus}
+        )
+    </insert>
+
+    <update id="changeTestLogStatus" parameterType="java.util.Map">
+        update tlog
+        set t_status=#{status}
+        where t_id=#{testId};
+    </update>
+
+    <update id="changeTestLog" parameterType="org.icslab.sibadev.devices.test.domain.TestLogDTO">
+        update tlog
+        set
+        t_status=#{testStats},
+        fin_at=#{finishedAt},
+        duration_at=#{durtaionAt}
+        where t_id=#{testId};
+    </update>
+
+    <!--CURRENT_TIMESTAMP(2)-->
+
     <!-- <result property="userId" column="user_id"/> -->
     <resultMap id="TextBox" type="org.icslab.sibadev.devices.test.domain.TextBoxVO">
         <result property="boxId" column="box_id"/>
