@@ -6,6 +6,18 @@ spring:
 spring:
   profiles: develop
 
+  redis:
+    host: 127.0.0.1
+    port: 6379
+
+  rabbitmq:
+    host: 127.0.0.1
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    username: temp
+    password: temp
+
   datasource:
     url: jdbc:mariadb://127.0.0.1:3307/siba_be_dev
     username: root

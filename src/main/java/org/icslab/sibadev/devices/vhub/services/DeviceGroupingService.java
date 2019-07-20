@@ -1,6 +1,5 @@
 package org.icslab.sibadev.devices.vhub.services;
 
-import org.icslab.sibadev.devices.device.domain.DeviceDTO;
 import org.icslab.sibadev.devices.device.domain.DeviceShortDTO;
 import org.icslab.sibadev.devices.vhub.domain.VirtualHubDTO;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,12 @@ public class DeviceGroupingService {
                 if(item.getAuthKey() !=null) devices.add(item);
                 VirtualHubDTO  virtualHub = VirtualHubDTO.builder()
                         .vhubId(curHubId)
+                        .hubKey(item.getHubKey())
+                        .hubName(item.getHubName())
+                        .hubStatus(item.getHubStatus())
+                        .hubIp(item.getHubIp())
+                        .hubPort(item.getHubPort())
+                        .hubType(item.getHubType())
                         .devices(devices)
                         .build();
                 hubInfo.add(virtualHub);

@@ -45,7 +45,8 @@ public class TextBoxGraphInsertionService {
     private void multipleTableMultipleInsert(TextBoxGraphDTO textBoxGraphDTO) {
         deviceMapper.insertTextBoxes(textBoxGraphDTO.getPallet(), textBoxGraphDTO.getDevId());
         deviceMapper.insertButtons(this.getAllButtons(textBoxGraphDTO), textBoxGraphDTO.getDevId());
-        deviceMapper.insertLinkers(textBoxGraphDTO.getLinkers(), textBoxGraphDTO.getDevId());
+        if(textBoxGraphDTO.getLinkers().size()>0)
+            deviceMapper.insertLinkers(textBoxGraphDTO.getLinkers(), textBoxGraphDTO.getDevId());
     }
 
     private List<ButtonWrapperDTO> getAllButtons(TextBoxGraphDTO textBoxGraphDTO) {

@@ -17,13 +17,13 @@ public class TextBoxGraphDTO {
 
     private String devName;
 
-    private int vHubId;
+    private Integer vHubId;
 
-    private int blockIdCounter;
+    private Integer blockIdCounter;
 
-    private int codeIdCounter;
+    private Integer codeIdCounter;
 
-    private int eventCodeIdCounter;
+    private Integer eventCodeIdCounter;
 
     private Boolean haveEntry;
 

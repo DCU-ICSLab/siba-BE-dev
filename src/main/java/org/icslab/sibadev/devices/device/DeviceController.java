@@ -1,7 +1,9 @@
 package org.icslab.sibadev.devices.device;
 
 import lombok.extern.slf4j.Slf4j;
+import org.icslab.sibadev.common.config.security.oauth2.UserPrincipal;
 import org.icslab.sibadev.common.domain.response.ResponseDTO;
+import org.icslab.sibadev.devices.device.domain.ConnectedDeviceVO;
 import org.icslab.sibadev.devices.device.domain.DeviceDTO;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.TextBoxGraphDTO;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphDeployService;
@@ -11,7 +13,10 @@ import org.icslab.sibadev.devices.device.services.UniqueKeyGenService;
 import org.icslab.sibadev.mappers.DeviceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -33,7 +38,7 @@ public class DeviceController {
     private DeviceMapper deviceMapper;
 
     @GetMapping("/device/{devId}")
-    public ResponseDTO getDeviceInformation(@PathVariable Integer devId){
+    public ResponseDTO getDeviceInformation(@PathVariable Integer devId) {
 
         TextBoxGraphDTO textBoxGraphDTO = textBoxGraphGenerateService.generate(devId);
         System.out.println(textBoxGraphDTO);
@@ -45,26 +50,29 @@ public class DeviceController {
     }
 
     @PostMapping("/device")
-    public ResponseDTO createIoTDevice(@RequestBody DeviceDTO deviceDTO){
+    public ResponseDTO createIoTDevice(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody DeviceDTO deviceDTO) {
 
-       deviceDTO.setBoxIdCnt(1);
-       deviceDTO.setCodeCnt(0);
-       deviceDTO.setEvCodeCnt(0);
-       deviceDTO.setHaveEntry(false);
+        Long userId = userPrincipal.getId();
+
+        deviceDTO.setUserId(userId);
+        deviceDTO.setBoxIdCnt(1);
+        deviceDTO.setCodeCnt(0);
+        deviceDTO.setEvCodeCnt(0);
+        deviceDTO.setHaveEntry(false);
 
         System.out.println(deviceDTO);
 
-       deviceMapper.createDevice(deviceDTO);
+        deviceMapper.createDevice(deviceDTO);
 
-       return ResponseDTO.builder()
-               .msg("IoT device create is success")
-               .status(HttpStatus.OK)
-               .data(deviceDTO)
-               .build();
+        return ResponseDTO.builder()
+                .msg("IoT device create is success")
+                .status(HttpStatus.OK)
+                .data(deviceDTO)
+                .build();
     }
 
     @PostMapping("/device/{devId}")
-    public ResponseDTO saveDeviceInformation(@RequestBody TextBoxGraphDTO textBoxGraphDTO, @PathVariable Integer devId){
+    public ResponseDTO saveDeviceInformation(@RequestBody TextBoxGraphDTO textBoxGraphDTO, @PathVariable Integer devId) {
         System.out.println(textBoxGraphDTO);
 
         textBoxGraphInsertionService.insertion(textBoxGraphDTO);
@@ -76,16 +84,28 @@ public class DeviceController {
     }
 
     @PostMapping("/device/{devId}/deploy")
-    public ResponseDTO saveDeviceInformation(@PathVariable Integer devId){
+    public ResponseDTO saveDeviceInformation(@PathVariable Integer devId) {
         return textBoxGraphDeployService.deploy(devId);
     }
 
     @PostMapping("/device/authkey")
-    public ResponseDTO createAndReturnUniqueKey(){
+    public ResponseDTO createAndReturnUniqueKey() {
         return ResponseDTO.builder()
                 .msg("device authentication key")
                 .status(HttpStatus.OK)
                 .data(uniqueKeyGenService.generate())
+                .build();
+    }
+
+    @GetMapping("/device/{devId}/conndev")
+    public ResponseDTO getConnectedDevInfo(@PathVariable Integer devId) {
+
+        List<ConnectedDeviceVO> connectedDeviceVOS = deviceMapper.getConnectedDeviceInfo(devId);
+
+        return ResponseDTO.builder()
+                .msg("connected device list")
+                .status(HttpStatus.OK)
+                .data(connectedDeviceVOS)
                 .build();
     }
 }

@@ -8,6 +8,18 @@ public class DeviceShortDTO {
 
     private Integer vHubId;
 
+    private String hubKey;
+
+    private String hubName;
+
+    private Boolean hubStatus;
+
+    private String hubIp;
+
+    private Integer hubPort;
+
+    private char hubType;
+
     private Integer devId;
 
     private String devName;
