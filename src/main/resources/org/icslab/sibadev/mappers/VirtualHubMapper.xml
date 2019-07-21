@@ -27,7 +27,7 @@
     </select>
 
     <select id="getVirtualHubHostInfo" parameterType="Integer" resultMap="VirtualHubHostVO">
-        SELECT hub_ip, hub_port FROM vhub WHERE vhub_id=#{vhubId}
+        SELECT hub_ip, hub_port, hub_key FROM vhub WHERE vhub_id=#{vhubId}
     </select>
 
     <!-- userId를 이용하여 userinfo get -->
@@ -82,6 +82,7 @@
         <constructor>
             <arg name="host" column="hub_ip" javaType="String"></arg>
             <arg name="port" column="hub_port" javaType="Integer"></arg>
+            <arg name="hubAuthKey" column="hub_key" javaType="String"></arg>
         </constructor>
     </resultMap>
 

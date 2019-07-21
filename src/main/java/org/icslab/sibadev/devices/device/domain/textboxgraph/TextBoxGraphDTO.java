@@ -1,6 +1,7 @@
 package org.icslab.sibadev.devices.device.domain.textboxgraph;
 
 import lombok.*;
+import org.icslab.sibadev.devices.test.domain.TestLogVO;
 
 import java.util.List;
 
@@ -30,4 +31,6 @@ public class TextBoxGraphDTO {
     private List<TextBoxDTO> pallet;
 
     private List<LinkerDTO> linkers;
+
+    private List<TestLogVO> testLogList;
 }

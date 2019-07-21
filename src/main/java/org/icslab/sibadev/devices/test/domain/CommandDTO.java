@@ -11,7 +11,7 @@ public class CommandDTO {
 
     private String btnType;
 
-    private Integer evnetCode;
+    private Integer eventCode;
 
     private List<OptionalDataDTO> additional;
 }

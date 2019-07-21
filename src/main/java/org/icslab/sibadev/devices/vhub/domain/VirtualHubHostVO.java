@@ -10,4 +10,6 @@ public class VirtualHubHostVO {
     private String host;
 
     private Integer port;
+
+    private String hubAuthKey;
 }

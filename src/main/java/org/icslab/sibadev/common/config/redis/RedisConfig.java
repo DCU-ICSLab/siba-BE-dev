@@ -1,10 +1,6 @@
 package org.icslab.sibadev.common.config.redis;
 
-import org.icslab.sibadev.common.config.websocket.services.SendToClientService;
-import org.icslab.sibadev.devices.vhub.domain.VirtualHubVO;
-import org.icslab.sibadev.mappers.CLogMapper;
-import org.icslab.sibadev.mappers.DeviceMapper;
-import org.icslab.sibadev.mappers.VirtualHubMapper;
+import org.icslab.sibadev.common.config.redis.listeners.KeepAliveKeyExpirationListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,24 +14,10 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.util.List;
-
 @Configuration
 @EnableRedisRepositories
 @PropertySource("classpath:application.yml")
 public class RedisConfig{
-
-    @Autowired
-    private SendToClientService sendToClientService;
-
-    @Autowired
-    private VirtualHubMapper virtualHubMapper;
-
-    @Autowired
-    private CLogMapper cLogMapper;
-
-    @Autowired
-    private DeviceMapper deviceMapper;
 
     @Value("${spring.redis.host}")
     private String host;
@@ -43,11 +25,15 @@ public class RedisConfig{
     @Value("${spring.redis.port}")
     private int port;
 
+    @Autowired
+    private KeepAliveKeyExpirationListener keepAliveKeyExpirationListener;
+
     @Bean
     public LettuceConnectionFactory lettuceConnectionFactory() {
         return new LettuceConnectionFactory(this.host, this.port);
     }
 
+    //keep alive template
     @Bean
     public RedisTemplate<String, Boolean> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
         RedisTemplate redisTemplate = new RedisTemplate();
@@ -57,32 +43,25 @@ public class RedisConfig{
         return redisTemplate;
     }
 
+    //test management template
+    /*@Bean
+    public RedisTemplate<Long, Long> redisTestManageTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+        RedisTemplate redisTemplate = new RedisTemplate();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Long.class));
+        redisTemplate.setConnectionFactory(lettuceConnectionFactory);
+        return redisTemplate;
+    }*/
+
     //redis 데이터 만료시 발생
     @Bean
     RedisMessageListenerContainer keyExpirationListenerContainer(LettuceConnectionFactory lettuceConnectionFactory) {
 
         RedisMessageListenerContainer listenerContainer = new RedisMessageListenerContainer();
-
         listenerContainer.setConnectionFactory(lettuceConnectionFactory);
-        listenerContainer.addMessageListener((message, pattern) -> {
 
-            VirtualHubVO virtualHubVO = virtualHubMapper.getHubOwner(message.toString());
-
-            sendToClientService.sendToReactClient(virtualHubVO,0);
-            virtualHubMapper.updateHubStatus(message.toString(), false); //허브 상태 갱신
-
-            //허브에 연결된 레포지토리들의 장비들 제거
-            List<Integer> repoList= virtualHubMapper.getAllLinkedRepoId(virtualHubVO.getHubId());
-            for (Integer devId: repoList) {
-                deviceMapper.deleteConnectedDeviceById(devId);
-            }
-
-            cLogMapper.insertCLog(virtualHubVO.getUserId(),"2");
-            System.out.println("expire");
-            //System.out.println(message);
-            // event handling comes here
-
-        }, new PatternTopic("__keyevent@*__:expired"));
+        //expire event handling
+        listenerContainer.addMessageListener(keepAliveKeyExpirationListener, new PatternTopic("__keyevent@*__:expired"));
 
         return listenerContainer;
     }

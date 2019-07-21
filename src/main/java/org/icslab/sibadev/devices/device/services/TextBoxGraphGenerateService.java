@@ -7,6 +7,7 @@ import org.icslab.sibadev.devices.device.domain.DeviceDTO;
 import org.icslab.sibadev.devices.device.domain.TextBoxVO;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.*;
 import org.icslab.sibadev.mappers.DeviceMapper;
+import org.icslab.sibadev.mappers.TestMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,9 @@ public class TextBoxGraphGenerateService {
 
     @Autowired
     private DeviceMapper deviceMapper;
+
+    @Autowired
+    private TestMapper testMapper;
 
     @Getter
     @Setter
@@ -87,6 +91,7 @@ public class TextBoxGraphGenerateService {
                 .haveEntry(deviceDTO.getHaveEntry())
                 .pallet(textBoxDTOList)
                 .linkers(linkerDTOList)
+                .testLogList(testMapper.getTestLogList(deviceDTO.getDevId()))
                 .build();
     }
 
