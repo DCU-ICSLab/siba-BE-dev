@@ -2,7 +2,6 @@ package org.icslab.sibadev.devices.test.services;
 
 import org.icslab.sibadev.common.config.redis.repository.KeepAliveRepository;
 import org.icslab.sibadev.common.config.redis.repository.TestKeyManagementRepository;
-import org.icslab.sibadev.common.config.security.oauth2.UserPrincipal;
 import org.icslab.sibadev.common.domain.response.ResponseDTO;
 import org.icslab.sibadev.devices.test.constants.TestResponseMessageSet;
 import org.icslab.sibadev.devices.test.domain.TestLogDTO;
@@ -14,17 +13,15 @@ import org.icslab.sibadev.mappers.VirtualHubMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.TemporalField;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.icslab.sibadev.common.config.redis.RedisConstants.HUB_PREFIX;
+import static org.icslab.sibadev.common.config.redis.RedisConstants.TEST_PREFIX;
 
 @Service
 public class DeviceTestService {
@@ -35,8 +32,8 @@ public class DeviceTestService {
     @Autowired
     private TestMapper testMapper;
 
-    //@Autowired
-    //private TestKeyManagementRepository testKeyManagementRepository;
+    @Autowired
+    private TestKeyManagementRepository testKeyManagementRepository;
 
     @Autowired
     private KeepAliveRepository keepAliveRepository;
@@ -53,11 +50,11 @@ public class DeviceTestService {
         Integer port = virtualHubHostVO.getPort();
 
         //허브가 현재 연결되어 있다면 수행
-        if(keepAliveRepository.find(virtualHubHostVO.getHubAuthKey())!=null){
+        if(keepAliveRepository.find(HUB_PREFIX+virtualHubHostVO.getHubAuthKey())!=null){
             RestTemplate restTemplate = new RestTemplate();
 
             TestLogDTO testLogDTO = TestLogDTO.builder()
-                    .testStatus('2') //상태는 pending
+                    .testStatus("2") //상태는 pending
                     .devId(testSetDTO.getDevId())
                     .devMac(devMac)
                     .build();
@@ -68,14 +65,13 @@ public class DeviceTestService {
             testSetDTO.setDevMac(devMac);
             Integer testId = Integer.valueOf(map.get("testId").toString()); //sequence 값 추출
             testSetDTO.setTestId(testId);
-
-            System.out.println(testSetDTO);
+            testLogDTO.setTestId(testId);
 
             try{
                 TestResponseDTO testResponseDTO = restTemplate.postForObject("http://"+hubHost+":"+port+"/dev/"+devMac, testSetDTO, TestResponseDTO.class);
 
                 Long startedAt = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli();
-                //testKeyManagementRepository.saveTestId(testId, startedAt); //test timeout 설정
+                testKeyManagementRepository.saveTestId(TEST_PREFIX+testId.toString(), startedAt); //test timeout 설정
 
                 result = ResponseDTO.builder()
                         .status(HttpStatus.valueOf(testResponseDTO.getStatus()))
@@ -84,7 +80,8 @@ public class DeviceTestService {
                         .build();
                 return result;
             }catch (Exception e){
-                testMapper.changeTestLogStatus(testId, '1'); //실패로 변경
+                testMapper.changeTestLogStatus(testId, "1"); //실패로 변경
+                System.out.println("Exception is occured");
                 return result;
             }
         }

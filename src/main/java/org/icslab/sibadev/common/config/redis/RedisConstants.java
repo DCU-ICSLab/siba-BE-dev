@@ -7,4 +7,8 @@ public final class RedisConstants {
 
     //test pending 유지 시간
     public static final long TEST_WAIT_TIMEOUT = 20L;
+
+    public static final  String HUB_PREFIX = "hub_";
+
+    public static final  String TEST_PREFIX = "test_";
 }

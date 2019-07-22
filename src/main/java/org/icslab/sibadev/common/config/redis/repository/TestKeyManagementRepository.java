@@ -7,25 +7,25 @@ import org.springframework.stereotype.Repository;
 
 import java.util.concurrent.TimeUnit;
 
-//@Repository
+@Repository
 public class TestKeyManagementRepository {
 
-    /*private RedisTemplate<Integer, Long> redisTestManageTemplate;
+    private RedisTemplate<String, Long> redisTestManageTemplate;
 
-    private ValueOperations<Integer, Long> valueOperations;
+    private ValueOperations<String, Long> valueOperations;
 
-    public TestKeyManagementRepository(RedisTemplate<Integer, Long> redisTestManageTemplate){
+    public TestKeyManagementRepository(RedisTemplate<String, Long> redisTestManageTemplate){
         this.redisTestManageTemplate = redisTestManageTemplate;
         this.valueOperations = this.redisTestManageTemplate.opsForValue();
     }
 
     //테스트 상태 조회
-    public Long findTestId(Integer key){
+    public Long findTestId(String key){
         return valueOperations.get(key);
     }
 
     //테스트 상태 추가
-    public void saveTestId(Integer testId, Long startedAt){
+    public void saveTestId(String testId, Long startedAt){
         valueOperations.set(testId, startedAt, RedisConstants.TEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
-    }*/
+    }
 }

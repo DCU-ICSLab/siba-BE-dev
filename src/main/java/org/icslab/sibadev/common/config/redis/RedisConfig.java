@@ -1,6 +1,7 @@
 package org.icslab.sibadev.common.config.redis;
 
 import org.icslab.sibadev.common.config.redis.listeners.KeepAliveKeyExpirationListener;
+import org.icslab.sibadev.devices.test.domain.TestLogDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -44,14 +45,14 @@ public class RedisConfig{
     }
 
     //test management template
-    /*@Bean
-    public RedisTemplate<Long, Long> redisTestManageTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+    @Bean
+    public RedisTemplate<String, Long> redisTestManageTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
         RedisTemplate redisTemplate = new RedisTemplate();
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Long.class));
         redisTemplate.setConnectionFactory(lettuceConnectionFactory);
         return redisTemplate;
-    }*/
+    }
 
     //redis 데이터 만료시 발생
     @Bean

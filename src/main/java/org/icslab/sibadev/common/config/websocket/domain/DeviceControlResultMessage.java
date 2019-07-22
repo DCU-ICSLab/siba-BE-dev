@@ -8,25 +8,25 @@ import java.sql.Timestamp;
 @ToString
 public class DeviceControlResultMessage implements Serializable {
 
-    private final int testId;
+    private final Integer testId;
 
     private final String msg;
 
-    private final char status;
+    private final String status;
 
-    private final Timestamp findishedAt;
+    private final Timestamp finishedAt;
 
-    private final long duration;
+    private final Long duration;
 
-    public DeviceControlResultMessage(int testId, String msg, char status, Timestamp findishedAt, long duration){
+    public DeviceControlResultMessage(Integer testId, String msg, String status, Timestamp finishedAt, Long duration){
         this.testId=testId;
         this.msg=msg;
         this.status=status;
-        this.findishedAt=findishedAt;
+        this.finishedAt=finishedAt;
         this.duration=duration;
     }
 
-    public int getTestId() {
+    public Integer getTestId() {
         return testId;
     }
 
@@ -34,15 +34,15 @@ public class DeviceControlResultMessage implements Serializable {
         return msg;
     }
 
-    public char getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public long getDuration() {
+    public Long getDuration() {
         return duration;
     }
 
-    public Timestamp getFindishedAt() {
-        return findishedAt;
+    public Timestamp getFinishedAt() {
+        return finishedAt;
     }
 }

@@ -17,14 +17,14 @@ public class DeviceControlResultMessage implements Serializable {
 
     private final HttpStatus status;
 
-    private final int testId;
+    private final Integer testId;
 
     private final int userId;
 
     public DeviceControlResultMessage(
             @JsonProperty("msg") String msg,
             @JsonProperty("status") int status,
-            @JsonProperty("testId") int testId,
+            @JsonProperty("testId") Integer testId,
             @JsonProperty("userId") int userId,
             @JsonProperty("devId") int devId,
             @JsonProperty("devMac") String devMac
@@ -46,7 +46,7 @@ public class DeviceControlResultMessage implements Serializable {
         return status;
     }
 
-    public int getTestId() {
+    public Integer getTestId() {
         return testId;
     }
 

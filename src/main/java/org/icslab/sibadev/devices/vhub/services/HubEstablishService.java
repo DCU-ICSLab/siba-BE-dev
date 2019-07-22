@@ -8,6 +8,8 @@ import org.icslab.sibadev.mappers.VirtualHubMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static org.icslab.sibadev.common.config.redis.RedisConstants.HUB_PREFIX;
+
 @Service
 public class HubEstablishService {
 
@@ -29,7 +31,7 @@ public class HubEstablishService {
         //인증키가 DB에 존재하지 않는다면 수행하지 않는다.
         if(virtualHubVO!=null) {
             System.out.println("hub connection: "+hubAuthKey);
-            keepAliveRepository.save(hubAuthKey, true);
+            keepAliveRepository.save(HUB_PREFIX+hubAuthKey, true);
             sendToClientService.sendToReactClient(virtualHubVO, 1);
             //허브 연결 상태로 변경
             virtualHubMapper.establishHub(hubAuthKey, hubIp, hubPort, true);

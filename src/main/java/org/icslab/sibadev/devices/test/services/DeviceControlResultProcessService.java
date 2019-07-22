@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.TimeZone;
 
+import static org.icslab.sibadev.common.config.redis.RedisConstants.TEST_PREFIX;
+
 @Service
 public class DeviceControlResultProcessService {
 
@@ -24,35 +26,32 @@ public class DeviceControlResultProcessService {
     @Autowired
     private SendToClientService sendToClientService;
 
-    //@Autowired
-    //private TestKeyManagementRepository testKeyManagementRepository;
+    @Autowired
+    private TestKeyManagementRepository testKeyManagementRepository;
 
     //디바이스로부터 명령 결과 응답 처리
     public void process(DeviceControlResultMessage message){
 
         //테스트가 timeout을 초과하지 않았다면 수행
-        //Long statedAt = testKeyManagementRepository.findTestId(message.getTestId());
-        //if(statedAt!=null){
-
-            //startedAt
-            //LocalDateTime startedAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(statedAt), TimeZone.getDefault().toZoneId());
-            LocalDateTime startedAt = LocalDateTime.now();
+        Long statedAtRedis = testKeyManagementRepository.findTestId(TEST_PREFIX+message.getTestId().toString());
+        if(statedAtRedis!=null){
 
             //finished time
             LocalDateTime current = LocalDateTime.now();
 
+            //startedAt
+            LocalDateTime startedAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(statedAtRedis), TimeZone.getDefault().toZoneId());
+
             Long durationAt = current.until(startedAt, ChronoUnit.SECONDS);
             Timestamp finishedAt = Timestamp.valueOf(current);
 
-            Character testStatus = message.getStatus() == HttpStatus.OK ? '1' : '2';
+            String testStatus = message.getStatus() == HttpStatus.OK ? "0" : "1";
 
             //테스트 상태 값 업데이트
-
-        //오류 발생  Execution of Rabbit message listener failed.
             testMapper.changeTestLog(
                     TestLogDTO.builder()
                             .testId(message.getTestId())
-                            .durtaionAt(finishedAt)
+                            .durationAt(durationAt)
                             .finishedAt(finishedAt)
                             .testStatus(testStatus) //성공
                             .build()
@@ -68,6 +67,6 @@ public class DeviceControlResultProcessService {
                             durationAt
                     )
             );
-        //}
+        }
     }
 }

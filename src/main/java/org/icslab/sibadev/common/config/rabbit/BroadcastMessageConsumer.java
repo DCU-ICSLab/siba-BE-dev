@@ -72,6 +72,6 @@ public class BroadcastMessageConsumer {
     @RabbitListener(queues = {RabbitMQConstants.DEVICE_CONTROL_QUEUE})
     public void controlResultReceive(final DeviceControlResultMessage message) {
         System.out.println(message);
-        //deviceControlResultProcessService.process(message);
+        deviceControlResultProcessService.process(message);
     }
 }

@@ -16,5 +16,5 @@ public class TestLogVO {
 
     private Timestamp finishedAt;
 
-    private Timestamp durationAt;
+    private Long durationAt;
 }

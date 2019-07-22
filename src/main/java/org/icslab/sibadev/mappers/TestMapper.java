@@ -36,9 +36,13 @@ public interface TestMapper {
     void changeTestLogStatus(
             @Param("testId")
             int testId,
-            @Param("testId")
-            Character status
+            @Param("status")
+            String status
     );
 
     void changeTestLog(TestLogDTO testLogDTO);
+
+    String getTestLogStatus(Integer testId);
+
+    Integer getTestOwner(Integer testId);
 }
