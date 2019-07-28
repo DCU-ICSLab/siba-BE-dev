@@ -53,7 +53,7 @@ public class DeviceControlResultProcessService {
                             .testId(message.getTestId())
                             .durationAt(durationAt)
                             .finishedAt(finishedAt)
-                            .testStatus(testStatus) //성공
+                            .testStatus(testStatus)
                             .build()
             );
 

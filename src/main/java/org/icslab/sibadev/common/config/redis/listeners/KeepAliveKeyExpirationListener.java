@@ -65,15 +65,17 @@ public class KeepAliveKeyExpirationListener implements MessageListener {
             }
 
             cLogMapper.insertCLog(virtualHubVO.getUserId(),"2");
-            System.out.println("hub expirte");
+            System.out.println("hub expire");
         }
 
         //test가 pending이였다면 수행
         else if(prefix.equals(TEST_PREFIX)){
-            System.out.println("test expirte");
+            System.out.println("test expire");
             Integer testId = Integer.parseInt(keypair[1]);
 
-            if(!testMapper.getTestLogStatus(testId).equals(("2"))) return;
+            //pending 상태 였다면
+            String testRes = testMapper.getTestLogStatus(testId);
+            if(!testRes.equals(("2"))) return;
 
             System.out.println("sh");
 

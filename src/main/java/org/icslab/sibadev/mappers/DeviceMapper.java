@@ -21,6 +21,8 @@ public interface DeviceMapper {
 
     Integer getRepositoryOwner(String devKey);
 
+    String getBtnName(Integer eventCode);
+
     List<DeviceShortDTO> getDeviceAndHub(Long userId);
 
     List<DeviceDTO> getDevices(Long userId);

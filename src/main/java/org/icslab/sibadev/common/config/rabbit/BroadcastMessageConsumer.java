@@ -38,7 +38,7 @@ public class BroadcastMessageConsumer {
 
         //Entity chargeOrder = MapperUtil.writeStringAsObject(message, Entity.class);
         virtualHubKeepAliveService.keep(message.getId());
-        System.out.println(message.getId());
+        //System.out.println(message.getId());
     }
 
     //hub establish consumer
@@ -71,7 +71,7 @@ public class BroadcastMessageConsumer {
     //device control result consumer
     @RabbitListener(queues = {RabbitMQConstants.DEVICE_CONTROL_QUEUE})
     public void controlResultReceive(final DeviceControlResultMessage message) {
-        System.out.println(message);
+        //System.out.println(message);
         deviceControlResultProcessService.process(message);
     }
 }

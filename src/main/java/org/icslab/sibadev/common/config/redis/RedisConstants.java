@@ -11,4 +11,6 @@ public final class RedisConstants {
     public static final  String HUB_PREFIX = "hub_";
 
     public static final  String TEST_PREFIX = "test_";
+
+    public static final  String TEST_RESERVATION_PREFIX = "testr_";
 }

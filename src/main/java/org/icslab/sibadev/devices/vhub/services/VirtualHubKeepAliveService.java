@@ -34,7 +34,7 @@ public class VirtualHubKeepAliveService {
 
         //해당 hubAuthKey가 in-memory에 존재 하는 경우 유효 시간 갱신 작업 수행
         if(keepAliveRepository.find(HUB_PREFIX+hubAuthKey)!=null){
-            System.out.println("[update]: "+hubAuthKey);
+            //System.out.println("[update]: "+hubAuthKey);
             keepAliveRepository.update(HUB_PREFIX+hubAuthKey, true);
         }
 

@@ -134,6 +134,12 @@
         FROM dev
         WHERE users_id = #{userId};
     </select>
+
+    <select id="getBtnName" parameterType="Integer" resultType="String">
+        SELECT btn_name
+        FROM btn
+        WHERE ev_code=#{eventCode}
+    </select>
     
     <update id="updateDevice" parameterType="org.icslab.sibadev.devices.device.domain.DeviceDTO">
         UPDATE dev

@@ -28,4 +28,9 @@ public class TestKeyManagementRepository {
     public void saveTestId(String testId, Long startedAt){
         valueOperations.set(testId, startedAt, RedisConstants.TEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
     }
+
+    //테스트 상태 추가
+    public void saveTestId(String testId, Long startedAt, Long reservationAt){
+        valueOperations.set(testId, startedAt, (reservationAt - startedAt)+10, TimeUnit.SECONDS);
+    }
 }
