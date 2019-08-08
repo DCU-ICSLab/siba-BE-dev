@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.icslab.sibadev.mappers.DataModelMapper">
+
+    <select id="getDataModel" parameterType="java.util.Map" resultMap="DataModelDTO">
+        SELECT
+          data_key,
+          dev_id,
+          data_type,
+          is_ev,
+          mod_type
+        FROM data_model
+        WHERE dev_id=#{devId} AND mod_type=#{modType}
+    </select>
+
+    <insert id="insertDataModel" parameterType="org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO">
+        INSERT INTO data_model (
+        data_key,
+        dev_id,
+        data_type,
+        is_ev,
+        mod_type
+        )
+        VALUE
+        (
+        #{dataKey},
+        #{devId},
+        #{dataType},
+        #{isEv},
+        #{modType}
+        )
+    </insert>
+
+    <resultMap id="DataModelDTO" type="org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO">
+        <result property="dataKey" column="data_key"/>
+        <result property="devId" column="dev_id"/>
+        <result property="dataType" column="data_type"/>
+        <result property="isEv" column="is_ev"/>
+        <result property="modType" column="mod_type"/>
+    </resultMap>
+</mapper>

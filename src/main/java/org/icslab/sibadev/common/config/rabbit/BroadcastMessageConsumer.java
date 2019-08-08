@@ -56,16 +56,18 @@ public class BroadcastMessageConsumer {
         //디바이스가 연결되면 연결 디바이스 정보 저장
         //예외 처리 해야함.
         //서버가 꺼졌다가 켜지면 연결 데이터 그대로 남아있을것.
+        Integer devId = deivceMapper.findDevId(message.getDevKey());
         if(message.getMsgType()==1){
-            Integer devId = deivceMapper.findDevId(message.getDevKey());
-            if(devId !=null)
+            if(devId !=null){
+                deivceMapper.deleteConnectedDevice(message.getMac());
                 deivceMapper.createConnectedDevice(devId, message.getMac());
+            }
         }
         else if(message.getMac()!=null && !message.getMac().isEmpty()){
             deivceMapper.deleteConnectedDevice(message.getMac());
         }
 
-        deviceEstablishService.establish(message.getDevKey(), message.getMac(), message.getMsgType());
+        deviceEstablishService.establish(message.getDevKey(), message.getMac(), message.getMsgType(), devId);
     }
 
     //device control result consumer

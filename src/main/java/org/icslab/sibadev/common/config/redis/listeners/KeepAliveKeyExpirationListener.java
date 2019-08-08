@@ -1,10 +1,14 @@
 package org.icslab.sibadev.common.config.redis.listeners;
 
 import org.icslab.sibadev.common.config.redis.RedisConstants;
+import org.icslab.sibadev.common.config.redis.repository.KeepAliveRepository;
 import org.icslab.sibadev.common.config.redis.repository.TestKeyManagementRepository;
 import org.icslab.sibadev.common.config.websocket.services.SendToClientService;
 import org.icslab.sibadev.devices.test.domain.TestLogDTO;
+import org.icslab.sibadev.devices.test.domain.TestResponseDTO;
+import org.icslab.sibadev.devices.vhub.domain.VirtualHubHostVO;
 import org.icslab.sibadev.devices.vhub.domain.VirtualHubVO;
+import org.icslab.sibadev.devices.vhub.services.HubEstablishService;
 import org.icslab.sibadev.mappers.CLogMapper;
 import org.icslab.sibadev.mappers.DeviceMapper;
 import org.icslab.sibadev.mappers.TestMapper;
@@ -12,7 +16,9 @@ import org.icslab.sibadev.mappers.VirtualHubMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -53,19 +59,23 @@ public class KeepAliveKeyExpirationListener implements MessageListener {
 
         //허브 키 라면
         if(prefix.equals(HUB_PREFIX)){
-            VirtualHubVO virtualHubVO = virtualHubMapper.getHubOwner(keypair[1]);
+            //단말이 실제로 죽었는지 체크한다.
+            if(this.checkHubIsLive(keypair[1])){
 
-            sendToClientService.sendToReactClient(virtualHubVO,0);
-            virtualHubMapper.updateHubStatus(keypair[1], false); //허브 상태 갱신
+                VirtualHubVO virtualHubVO = virtualHubMapper.getHubOwner(keypair[1]);
 
-            //허브에 연결된 레포지토리들의 장비들 제거
-            List<Integer> repoList= virtualHubMapper.getAllLinkedRepoId(virtualHubVO.getHubId());
-            for (Integer devId: repoList) {
-                deviceMapper.deleteConnectedDeviceById(devId);
+                sendToClientService.sendToReactClient(virtualHubVO, 0);
+                virtualHubMapper.updateHubStatus(keypair[1], false); //허브 상태 갱신
+
+                //허브에 연결된 레포지토리들의 장비들 제거
+                List<Integer> repoList = virtualHubMapper.getAllLinkedRepoId(virtualHubVO.getHubId());
+                for (Integer devId : repoList) {
+                    deviceMapper.deleteConnectedDeviceById(devId);
+                }
+
+                cLogMapper.insertCLog(virtualHubVO.getUserId(), "2");
+                System.out.println("hub expire");
             }
-
-            cLogMapper.insertCLog(virtualHubVO.getUserId(),"2");
-            System.out.println("hub expire");
         }
 
         //test가 pending이였다면 수행
@@ -102,5 +112,23 @@ public class KeepAliveKeyExpirationListener implements MessageListener {
                     )
             );
         }
+    }
+
+    private boolean checkHubIsLive(String hubKey){
+        VirtualHubHostVO virtualHubHostVO = virtualHubMapper.getVirtualHubHostInfoWithKey(hubKey);
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(1000*5);
+        factory.setReadTimeout(1000*5);
+        RestTemplate restTemplate = new RestTemplate(factory);
+        String hubHost = virtualHubHostVO.getHost();
+        Integer port = virtualHubHostVO.getPort();
+
+        try{
+            TestResponseDTO testResponseDTO = restTemplate.postForObject("http://" + hubHost + ":" + port + "/hub/live", null, TestResponseDTO.class);
+        }
+        catch (Exception e){
+            return false;
+        }
+        return true;
     }
 }

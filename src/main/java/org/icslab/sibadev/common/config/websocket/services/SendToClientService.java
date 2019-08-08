@@ -26,9 +26,9 @@ public class SendToClientService{
     }
 
     //device connection info send to client
-    public void sendToReactClient(String mac, int messageType, Integer userId){
+    public void sendToReactClient(String mac, int messageType, Integer userId, Integer devId){
         simpMessagingTemplate.convertAndSend("/topic/device-conn-"+userId.toString()
-                , new DeviceEstablishMessage(mac, messageType));
+                , new DeviceEstablishMessage(mac, messageType, devId));
     }
 
     //test result send to client

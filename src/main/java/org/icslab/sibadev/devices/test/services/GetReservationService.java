@@ -25,6 +25,8 @@ public class GetReservationService {
 
     public TextBoxDTO getReservationForHub(String devMac, Integer vhubId){
 
+        Integer devId = deviceMapper.getDevIdWithDevMac(devMac);
+
         VirtualHubHostVO virtualHubHostVO = virtualHubMapper.getVirtualHubHostInfo(vhubId);
         String hubHost = virtualHubHostVO.getHost();
         Integer port = virtualHubHostVO.getPort();
@@ -37,7 +39,7 @@ public class GetReservationService {
         for(ReservationDTO item : reservationListDTO.getReservationList()){
             Date date = new Date(item.getActAt());
             SimpleDateFormat df2 = new SimpleDateFormat("MM/dd-HH:mm");
-            buttonVOList.add(new ButtonVO(index++, deviceMapper.getBtnName(item.getEventCode())+" ("+df2.format(date)+")", item.getResId(), "6", null));
+            buttonVOList.add(new ButtonVO(index++, deviceMapper.getBtnName(item.getEventCode(), devId)+" ("+df2.format(date)+")", item.getResId(), "6", null));
         }
 
         String preText = reservationListDTO.getReservationList().size()==0 ? "예약된 명령이 존재하지 않습니다." : "예약된 명령들 입니다. ("+reservationListDTO.getReservationList().size()+"개)";

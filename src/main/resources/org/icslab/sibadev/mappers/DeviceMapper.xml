@@ -75,7 +75,7 @@
                d.btn_code
         FROM box as box
         LEFT OUTER JOIN derivation as d
-        on box.box_id = d.cbox_id
+        on box.box_id = d.cbox_id AND box.dev_id = d.dev_id
         where box.dev_id=#{devId}
         ORDER BY box.box_id;
     </select>
@@ -97,7 +97,7 @@
         FROM
         btn as btn
         LEFT OUTER JOIN derivation as d
-        ON btn.btn_code = d.btn_code
+        ON btn.btn_code = d.btn_code AND btn.dev_id = d.dev_id
         where btn.dev_id=#{devId}
         order by btn.box_id, btn.idx;
     </select>
@@ -135,10 +135,16 @@
         WHERE users_id = #{userId};
     </select>
 
-    <select id="getBtnName" parameterType="Integer" resultType="String">
+    <select id="getBtnName" parameterType="java.util.Map" resultType="String">
         SELECT btn_name
         FROM btn
-        WHERE ev_code=#{eventCode}
+        WHERE ev_code=#{eventCode} AND dev_id=#{devId}
+    </select>
+
+    <select id="getBtnDetail" parameterType="java.util.Map" resultMap="BtnDetailVO">
+        SELECT btn_name, btn_code, box_id, dev_id, idx, ev_code
+        FROM btn
+        WHERE dev_id=#{devId} AND btn_type=#{btnType}
     </select>
     
     <update id="updateDevice" parameterType="org.icslab.sibadev.devices.device.domain.DeviceDTO">
@@ -165,21 +171,24 @@
         where dev_id=#{devId}
     </delete>
 
-    <insert id="createDevice" parameterType="org.icslab.sibadev.devices.device.domain.DeviceDTO">
+    <insert id="createDevice" parameterType="java.util.Map">
+        <selectKey keyProperty="devId" resultType="int" order="BEFORE">
+            select NEXTVAL(dev_sequence)
+        </selectKey>
         insert into dev(users_id, dev_id, auth_key, dev_name, dev_def_name, dev_type, category, vhub_id, box_id_cnt, code_cnt, have_entry, evcode_cnt)
         values (
-          #{userId},
-          NEXTVAL(dev_sequence),
-          #{authKey},
-          #{devName},
-          #{devDefName},
-          #{devType},
-          #{category},
+          #{device.userId},
+          #{devId},
+          #{device.authKey},
+          #{device.devName},
+          #{device.devDefName},
+          #{device.devType},
+          #{device.category},
           null,
-          #{boxIdCnt},
-          #{codeCnt},
-          #{haveEntry},
-          #{evCodeCnt}
+          #{device.boxIdCnt},
+          #{device.codeCnt},
+          #{device.haveEntry},
+          #{device.evCodeCnt}
         )
     </insert>
 
@@ -247,6 +256,12 @@
           CURRENT_TIMESTAMP(2)
         )
     </insert>
+
+    <select id="getDevIdWithDevMac" parameterType="String" resultType="Integer">
+        select dev_id
+        from conn_dev
+        where dev_mac=#{devMac}
+    </select>
 
     <delete id="deleteConnectedDevice" parameterType="String">
         delete from conn_dev
@@ -347,6 +362,17 @@
         <constructor>
             <arg name="devMac" column="dev_mac" javaType="String"></arg>
             <arg name="connectedAt" column="conn_at" javaType="java.sql.Timestamp"></arg>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="BtnDetailVO" type="org.icslab.sibadev.devices.device.domain.BtnDetailVO">
+        <constructor>
+            <arg name="btnName" column="btn_name" javaType="String"></arg>
+            <arg name="idx" column="idx" javaType="Integer"></arg>
+            <arg name="btnCode" column="btn_code" javaType="Integer"></arg>
+            <arg name="boxId" column="box_id" javaType="Integer"></arg>
+            <arg name="devId" column="dev_id" javaType="Integer"></arg>
+            <arg name="evCode" column="ev_code" javaType="Integer"></arg>
         </constructor>
     </resultMap>
 </mapper>
