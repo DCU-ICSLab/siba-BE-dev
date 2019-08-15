@@ -19,11 +19,14 @@ public class DeviceBoxSearchSerivce {
         TextBoxVO textBoxVO = testMapper.getTextBox(devId, boxId);
         List<ButtonVO> buttonVOS = testMapper.getTextButton(devId, boxId);
 
+        String preText =textBoxVO.getPreText();
+        String postText =textBoxVO.getPostText();
+
         //textBoxVO의 데이터가 아무 것도 없다면 Null pointer exception발생
         return TextBoxDTO.builder()
                 .boxId(textBoxVO.getBoxId())
-                .preText(textBoxVO.getPreText())
-                .postText(textBoxVO.getPostText())
+                .preText(preText)
+                .postText(postText)
                 .boxType(textBoxVO.getBoxType())
                 .buttons(buttonVOS)
                 .build();

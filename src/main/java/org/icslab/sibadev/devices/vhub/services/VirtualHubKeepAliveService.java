@@ -37,15 +37,5 @@ public class VirtualHubKeepAliveService {
             //System.out.println("[update]: "+hubAuthKey);
             keepAliveRepository.update(HUB_PREFIX+hubAuthKey, true);
         }
-
-        //해당 hubAuthKey가 in-memory에 존재 하지 않는 경우, 허브 연결
-        else{
-            VirtualHubVO virtualHubVO= virtualHubMapper.getHubOwner(hubAuthKey);
-
-            //인증키가 DB에 존재하지 않는다면 수행하지 않는다.
-            if(virtualHubVO!=null) {
-                keepAliveRepository.save(hubAuthKey, true);
-            }
-        }
     }
 }

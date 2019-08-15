@@ -3,10 +3,9 @@ package org.icslab.sibadev.devices.device;
 import lombok.extern.slf4j.Slf4j;
 import org.icslab.sibadev.common.config.security.oauth2.UserPrincipal;
 import org.icslab.sibadev.common.domain.response.ResponseDTO;
-import org.icslab.sibadev.devices.device.domain.BtnDetailVO;
-import org.icslab.sibadev.devices.device.domain.ConnectedDeviceVO;
-import org.icslab.sibadev.devices.device.domain.DeviceDTO;
+import org.icslab.sibadev.devices.device.domain.*;
 import org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO;
+import org.icslab.sibadev.devices.device.domain.datamodel.DataModelVO;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.TextBoxGraphDTO;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphDeployService;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphGenerateService;
@@ -19,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,8 +123,46 @@ public class DeviceController {
     @GetMapping("/device/{devId}/model")
     public ResponseDTO getDataModelInfo(@PathVariable Integer devId){
 
-        List<BtnDetailVO> selectSensing = deviceMapper.getBtnDetail(devId, "3"); //센싱-조회 버튼
-        List<BtnDetailVO> deviceState = deviceMapper.getBtnDetail(devId, "4"); //디바이스-조회 버튼
+        List<BoxRuleVO> boxRuleVOList = deviceMapper.getBoxAndRule(devId, "6");
+        List<SelectBoxDTO> boxRuleHierarchy = new ArrayList<>();
+        Integer boxId = -1;
+        for (BoxRuleVO boxRule : boxRuleVOList){
+            StateRuleDTO rule = null;
+            if(boxRule.getModId()!=null){
+                rule = StateRuleDTO.builder()
+                        .boxId(boxRule.getBoxId())
+                        .devId(boxRule.getDevId())
+                        .dataKey(boxRule.getDataKey())
+                        .modId(boxRule.getModId())
+                        .ruleType(boxRule.getRuleType())
+                        .ruleValue(boxRule.getRuleValue())
+                        .mapVal(boxRule.getMapVal())
+                        .modDevId(boxRule.getDevId())
+                        .build();
+            }
+            if(boxId!=boxRule.getBoxId()){
+                boxId=boxRule.getBoxId();
+                List<StateRuleDTO> rules = new ArrayList<StateRuleDTO>();
+                if(rule!=null)
+                    rules.add(rule);
+                boxRuleHierarchy.add(
+                        SelectBoxDTO.builder()
+                        .boxId(boxRule.getBoxId())
+                        .devId(boxRule.getDevId())
+                        .footRow(boxRule.getFootRow())
+                        .headRow(boxRule.getHeadRow())
+                        .postText(boxRule.getPostText())
+                        .preText(boxRule.getPreText())
+                        .rules(rules)
+                        .build()
+                );
+            }
+            else{
+                if(rule!=null)
+                    boxRuleHierarchy.get(boxRuleHierarchy.size()-1).getRules().add(rule);
+            }
+        }
+
 
         List<DataModelDTO> devState = dataModelMapper.getDataModel(devId, "0"); //디바이스 상태 모델
         List<DataModelDTO> sensingDt = dataModelMapper.getDataModel(devId, "1"); //센싱 데이터 모델
@@ -133,8 +171,7 @@ public class DeviceController {
                 .msg("device data model info")
                 .status(HttpStatus.OK)
                 .data(new Object(){
-                    public List<BtnDetailVO> sensingBtn = selectSensing;
-                    public List<BtnDetailVO> deviceStateBtn = deviceState;
+                    public List<SelectBoxDTO> boxRules = boxRuleHierarchy;
                     public List<DataModelDTO> devStateModel = devState;
                     public List<DataModelDTO> sensingDataModel = sensingDt;
                 })
@@ -150,6 +187,35 @@ public class DeviceController {
                 .msg("data model add success")
                 .status(HttpStatus.OK)
                 .data(dataModelDTO)
+                .build();
+    }
+
+    @PostMapping("/rule/{devId}")
+    public ResponseDTO createStateRule(@PathVariable Integer devId, @RequestBody StateRuleDTO stateRuleDTO){
+
+        Map<String,Object> map =new HashMap<>();
+        map.put("rule", stateRuleDTO);
+
+        System.out.println(stateRuleDTO);
+
+        deviceMapper.createStateRule(map);
+        stateRuleDTO.setModId((Integer) map.get("modId"));
+
+        return ResponseDTO.builder()
+                .data(stateRuleDTO)
+                .status(HttpStatus.OK)
+                .msg("new rule successfully add")
+                .build();
+    }
+
+    @GetMapping("/model/{devType}")
+    public ResponseDTO createStateRule(@PathVariable String devType){
+
+        return ResponseDTO.builder()
+                .data(new Object(){
+                    public List<DataModelVO> model = dataModelMapper.getDataModelWithKey(deviceMapper.findDevId(devType));
+                })
+                .status(HttpStatus.OK)
                 .build();
     }
 }

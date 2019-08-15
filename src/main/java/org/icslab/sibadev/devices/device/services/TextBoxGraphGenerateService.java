@@ -4,8 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.icslab.sibadev.devices.device.domain.BtnDerivationJoinVO;
 import org.icslab.sibadev.devices.device.domain.DeviceDTO;
+import org.icslab.sibadev.devices.device.domain.StateRuleDTO;
 import org.icslab.sibadev.devices.device.domain.TextBoxVO;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.*;
+import org.icslab.sibadev.mappers.DataModelMapper;
 import org.icslab.sibadev.mappers.DeviceMapper;
 import org.icslab.sibadev.mappers.TestMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ public class TextBoxGraphGenerateService {
 
     @Autowired
     private DeviceMapper deviceMapper;
+
+    @Autowired
+    private DataModelMapper dataModelMapper;
 
     @Autowired
     private TestMapper testMapper;
@@ -54,6 +59,11 @@ public class TextBoxGraphGenerateService {
             Integer curBoxId = textBox.getBoxId();
             if(prevBoxId.equals(curBoxId)) continue;
             prevBoxId = curBoxId;
+
+            List<StateRuleDTO> rules = null;
+            if(textBox.getBoxType()==6){
+                rules = dataModelMapper.getAllRules(devId, textBox.getBoxId());
+            }
             textBoxDTOList.add(
                     TextBoxDTO.builder()
                             .id(textBox.getBoxId())
@@ -76,6 +86,7 @@ public class TextBoxGraphGenerateService {
                             .linking(false)
                             .headRow(textBox.getHeadRow())
                             .footRow(textBox.getFootRow())
+                            .rules(rules)
                             .build()
             );
         }
@@ -97,11 +108,14 @@ public class TextBoxGraphGenerateService {
 
     private InfoDTO getAdditionalInfo(int boxType , List<BtnDerivationJoinVO> list, int boxId, Counter counter, List<LinkerDTO> linkerList) {
         InfoDTO info = null;
+
+        //switch case 제거 해야 함.
         switch (boxType) {
             case 1:
             case 2:
             case 3:
             case 5:
+            case 6:
                 info = InfoDTO.builder()
                         .buttons(getButtonsInfo(list, boxId, counter, linkerList))
                         .build();

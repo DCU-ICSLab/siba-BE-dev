@@ -141,10 +141,40 @@
         WHERE ev_code=#{eventCode} AND dev_id=#{devId}
     </select>
 
-    <select id="getBtnDetail" parameterType="java.util.Map" resultMap="BtnDetailVO">
-        SELECT btn_name, btn_code, box_id, dev_id, idx, ev_code
-        FROM btn
-        WHERE dev_id=#{devId} AND btn_type=#{btnType}
+    <!--<select id="getBtnDetail" parameterType="java.util.Map" resultMap="BoxRuleVO">
+        SELECT
+          btn.btn_name,
+          btn.btn_code,
+          btn.box_id,
+          btn.dev_id,
+          btn.idx,
+          btn.ev_code,
+          res.pre_text,
+          res.post_text
+        FROM btn as btn
+        LEFT OUTER JOIN res_box as res
+        ON btn.box_id = res.box_id AND btn.dev_id = res.dev_id AND btn.btn_code = res.btn_code
+        WHERE btn.dev_id=#{devId} AND btn.btn_type=#{btnType}
+    </select>-->
+
+    <select id="getBoxAndRule" parameterType="java.util.Map" resultMap="BoxRuleVO">
+      SELECT
+          box.box_id,
+          box.dev_id,
+          box.pre_text,
+          box.post_text,
+          box.head_row,
+          box.foot_row,
+          res.mod_id,
+          res.data_key,
+          res.rule_type,
+          res.rule_value,
+          res.map_val
+        FROM box as box
+        LEFT OUTER JOIN res_box_crs as res
+        ON box.box_id = res.box_id AND box.dev_id = res.dev_id
+        WHERE box.dev_id=#{devId} AND box.box_type=#{boxType}
+        ORDER BY box.box_id, res.mod_id ASC
     </select>
     
     <update id="updateDevice" parameterType="org.icslab.sibadev.devices.device.domain.DeviceDTO">
@@ -257,6 +287,33 @@
         )
     </insert>
 
+    <insert id="createStateRule" parameterType="java.util.Map">
+        <selectKey keyProperty="modId" resultType="int" order="BEFORE">
+            select NEXTVAL(mod_sequence)
+        </selectKey>
+        insert into res_box_crs(
+          mod_id,
+          mod_dev_id,
+          dev_id,
+          box_id,
+          data_key,
+          rule_type,
+          rule_value,
+          map_val
+        )
+        values
+        (
+          #{modId},
+          #{rule.modDevId},
+          #{rule.devId},
+          #{rule.boxId},
+          #{rule.dataKey},
+          #{rule.ruleType},
+          #{rule.ruleValue},
+          #{rule.mapVal}
+        )
+    </insert>
+
     <select id="getDevIdWithDevMac" parameterType="String" resultType="Integer">
         select dev_id
         from conn_dev
@@ -365,14 +422,20 @@
         </constructor>
     </resultMap>
 
-    <resultMap id="BtnDetailVO" type="org.icslab.sibadev.devices.device.domain.BtnDetailVO">
+    <resultMap id="BoxRuleVO" type="org.icslab.sibadev.devices.device.domain.BoxRuleVO">
         <constructor>
-            <arg name="btnName" column="btn_name" javaType="String"></arg>
-            <arg name="idx" column="idx" javaType="Integer"></arg>
-            <arg name="btnCode" column="btn_code" javaType="Integer"></arg>
             <arg name="boxId" column="box_id" javaType="Integer"></arg>
             <arg name="devId" column="dev_id" javaType="Integer"></arg>
-            <arg name="evCode" column="ev_code" javaType="Integer"></arg>
+            <arg name="preText" column="pre_text" javaType="String"></arg>
+            <arg name="postText" column="post_text" javaType="String"></arg>
+            <arg name="dataKey" column="data_key" javaType="String"></arg>
+            <arg name="ruleType" column="rule_type" javaType="String"></arg>
+            <arg name="ruleValue" column="rule_value" javaType="String"></arg>
+            <arg name="mapVal" column="map_val" javaType="String"></arg>
+            <arg name="headRow" column="head_row" javaType="Integer"></arg>
+            <arg name="footRow" column="foot_row" javaType="Integer"></arg>
+            <arg name="modId" column="mod_id" javaType="Integer"></arg>
         </constructor>
     </resultMap>
+
 </mapper>

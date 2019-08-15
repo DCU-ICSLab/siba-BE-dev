@@ -60,7 +60,7 @@ public class KeepAliveKeyExpirationListener implements MessageListener {
         //허브 키 라면
         if(prefix.equals(HUB_PREFIX)){
             //단말이 실제로 죽었는지 체크한다.
-            if(this.checkHubIsLive(keypair[1])){
+            //if(this.checkHubIsLive(keypair[1])){
 
                 VirtualHubVO virtualHubVO = virtualHubMapper.getHubOwner(keypair[1]);
 
@@ -75,7 +75,7 @@ public class KeepAliveKeyExpirationListener implements MessageListener {
 
                 cLogMapper.insertCLog(virtualHubVO.getUserId(), "2");
                 System.out.println("hub expire");
-            }
+            //}
         }
 
         //test가 pending이였다면 수행
@@ -112,23 +112,5 @@ public class KeepAliveKeyExpirationListener implements MessageListener {
                     )
             );
         }
-    }
-
-    private boolean checkHubIsLive(String hubKey){
-        VirtualHubHostVO virtualHubHostVO = virtualHubMapper.getVirtualHubHostInfoWithKey(hubKey);
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(1000*5);
-        factory.setReadTimeout(1000*5);
-        RestTemplate restTemplate = new RestTemplate(factory);
-        String hubHost = virtualHubHostVO.getHost();
-        Integer port = virtualHubHostVO.getPort();
-
-        try{
-            TestResponseDTO testResponseDTO = restTemplate.postForObject("http://" + hubHost + ":" + port + "/hub/live", null, TestResponseDTO.class);
-        }
-        catch (Exception e){
-            return false;
-        }
-        return true;
     }
 }

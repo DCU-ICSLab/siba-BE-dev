@@ -1,16 +1,16 @@
 package org.icslab.sibadev.devices.test;
 
 import org.icslab.sibadev.common.domain.response.ResponseDTO;
+import org.icslab.sibadev.devices.test.domain.BoxIndexDTO;
 import org.icslab.sibadev.devices.test.domain.TestResponseDTO;
 import org.icslab.sibadev.devices.test.domain.TestSetDTO;
 import org.icslab.sibadev.devices.test.domain.TextBoxDTO;
-import org.icslab.sibadev.devices.test.services.CancelReservationService;
-import org.icslab.sibadev.devices.test.services.DeviceBoxSearchSerivce;
-import org.icslab.sibadev.devices.test.services.DeviceTestService;
-import org.icslab.sibadev.devices.test.services.GetReservationService;
+import org.icslab.sibadev.devices.test.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 
 @RestController
 public class TestController {
@@ -26,6 +26,9 @@ public class TestController {
 
     @Autowired
     private CancelReservationService cancelReservationService;
+
+    @Autowired
+    private GetDeviceStateService getDeviceStateService;
 
     @GetMapping("/test/{devId}/box/{boxId}")
     public ResponseDTO getBox(@PathVariable Integer devId, @PathVariable Integer boxId){
@@ -67,5 +70,31 @@ public class TestController {
                 .msg(testResponseDTO.getMsg())
                 .status(HttpStatus.valueOf(testResponseDTO.getStatus()))
                 .build();
+    }
+
+    @PostMapping("/test/{vHubId}/state/{devMac}")
+    public ResponseDTO getDeviceState(@PathVariable String devMac, @PathVariable Integer vHubId, @RequestBody BoxIndexDTO boxIndexDTO){
+
+        try{
+            TextBoxDTO textBoxDTO = getDeviceStateService.process(devMac, vHubId, boxIndexDTO.getDevId(), boxIndexDTO.getBoxId());
+            return ResponseDTO.builder()
+                    .data(textBoxDTO)
+                    .msg("state info")
+                    .status(HttpStatus.OK)
+                    .build();
+        }
+        catch(Exception e){
+            return ResponseDTO.builder()
+                    .data(TextBoxDTO.builder()
+                            .preText("요청하신 명령을 수행하는 중에 오류가 발생했습니다.")
+                            .buttons(new ArrayList<>())
+                            .boxType(6)
+                            .boxId(-1)
+                            .postText("")
+                            .build())
+                    .msg("state info")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
     }
 }

@@ -160,5 +160,4 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         userMapper.update(existingUser);
         return existingUser;
     }
-
 }

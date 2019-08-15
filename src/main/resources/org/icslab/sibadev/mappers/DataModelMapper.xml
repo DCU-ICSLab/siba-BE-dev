@@ -16,6 +16,27 @@
         WHERE dev_id=#{devId} AND mod_type=#{modType}
     </select>
 
+    <select id="getDataModelWithKey" resultMap="DataModelVO" parameterType="Integer">
+      SELECT data_key, data_type, is_ev, mod_type
+      FROM data_model
+      where dev_id=#{devId}
+    </select>
+
+    <select id="getAllRules" parameterType="java.util.Map" resultMap="StateRuleDTO">
+      SELECT
+      mod_id,
+      mod_dev_id,
+      dev_id,
+      box_id,
+      data_key,
+      rule_type,
+      rule_value,
+      map_val
+      FROM res_box_crs
+      where dev_id=#{devId} AND box_id=#{boxId}
+      ORDER BY data_key ASC
+    </select>
+
     <insert id="insertDataModel" parameterType="org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO">
         INSERT INTO data_model (
         data_key,
@@ -34,11 +55,53 @@
         )
     </insert>
 
+    <insert id="insertAllRules" parameterType="java.util.Map">
+        insert into res_box_crs(mod_id, mod_dev_id, dev_id, box_id, data_key, rule_type, rule_value, map_val)
+        values
+        <foreach collection="rules" item="item" separator=" , ">
+            (
+            #{item.modId},
+            #{item.modDevId},
+            #{item.devId},
+            #{item.boxId},
+            #{item.dataKey},
+            #{item.ruleType},
+            #{item.ruleValue},
+            #{item.mapVal}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteRule" parameterType="Integer">
+        delete from res_box_crs
+        where dev_id=#{devId}
+    </delete>
+
     <resultMap id="DataModelDTO" type="org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO">
         <result property="dataKey" column="data_key"/>
         <result property="devId" column="dev_id"/>
         <result property="dataType" column="data_type"/>
         <result property="isEv" column="is_ev"/>
         <result property="modType" column="mod_type"/>
+    </resultMap>
+
+    <resultMap id="DataModelVO" type="org.icslab.sibadev.devices.device.domain.datamodel.DataModelVO">
+        <constructor>
+            <arg name="dataKey" column="data_key" javaType="String"></arg>
+            <arg name="dataType" column="data_type" javaType="String"></arg>
+            <arg name="isEv" column="is_ev" javaType="Boolean"></arg>
+            <arg name="modType" column="mod_type" javaType="String"></arg>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="StateRuleDTO" type="org.icslab.sibadev.devices.device.domain.StateRuleDTO">
+        <result property="modId" column="mod_id"/>
+        <result property="modDevId" column="mod_dev_id"/>
+        <result property="devId" column="dev_id"/>
+        <result property="boxId" column="box_id"/>
+        <result property="dataKey" column="data_key"/>
+        <result property="ruleType" column="rule_type"/>
+        <result property="ruleValue" column="rule_value"/>
+        <result property="mapVal" column="map_val"/>
     </resultMap>
 </mapper>

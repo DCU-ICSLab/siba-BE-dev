@@ -72,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                 //허용하는 url 설정
-                .antMatchers("/auth/**", "/oauth2/**", "/websocket/**")
+                .antMatchers("/auth/**", "/oauth2/**", "/websocket/**", "/model/**")
                 .permitAll()
                 //허용하는 url 이외의 url은 인증 요청
                 .anyRequest()

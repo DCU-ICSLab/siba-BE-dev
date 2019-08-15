@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.icslab.sibadev.devices.device.domain.StateRuleDTO;
 
 import java.util.List;
 
@@ -33,6 +34,8 @@ public class TextBoxDTO {
     private boolean linked;
 
     private InfoDTO info;
+
+    private List<StateRuleDTO> rules;
 }
 
 /*@Data

@@ -85,11 +85,13 @@ public interface DeviceMapper {
             @Param("devId")
             Integer devId);
 
-    List<BtnDetailVO> getBtnDetail(
+    List<BoxRuleVO> getBoxAndRule(
             @Param("devId")
             Integer devId,
-            @Param("btnType")
-            String btnType);
+            @Param("boxType")
+            String boxType);
+
+    void createStateRule(Map<String,Object> map);
 
     //void multipleTableMultipleInsert();
 }
