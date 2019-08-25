@@ -7,6 +7,8 @@ import lombok.ToString;
 @ToString
 public class DataModelDTO {
 
+    private Integer modId;
+
     private String dataKey;
 
     private Integer devId;

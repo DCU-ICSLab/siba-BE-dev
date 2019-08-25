@@ -24,4 +24,6 @@ public class StateRuleDTO {
     private String ruleValue;
 
     private String mapVal;
+
+    private Integer priority;
 }

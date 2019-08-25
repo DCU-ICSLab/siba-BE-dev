@@ -78,7 +78,7 @@ public class TextBoxGraphInsertionService {
         List<StateRuleDTO> list = new ArrayList<>();
         for (TextBoxDTO textBoxDTO: textBoxDTOS) {
             //select box라면
-            if(textBoxDTO.getType()==6){
+            if(textBoxDTO.getType()==6 && textBoxDTO.getRules()!=null){
                 list.addAll(textBoxDTO.getRules());
             }
         }

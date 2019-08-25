@@ -6,6 +6,7 @@ import org.icslab.sibadev.common.domain.response.ResponseDTO;
 import org.icslab.sibadev.devices.device.domain.*;
 import org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO;
 import org.icslab.sibadev.devices.device.domain.datamodel.DataModelVO;
+import org.icslab.sibadev.devices.device.domain.event.*;
 import org.icslab.sibadev.devices.device.domain.textboxgraph.TextBoxGraphDTO;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphDeployService;
 import org.icslab.sibadev.devices.device.services.TextBoxGraphGenerateService;
@@ -163,6 +164,54 @@ public class DeviceController {
             }
         }
 
+        List<EventVO> eventVOS = dataModelMapper.getAllEvents(devId);
+        List<EventDTO> eventDTOS = new ArrayList<>();
+
+        for (EventVO event: eventVOS) {
+            EventDTO eventDTO = EventDTO.builder()
+                    .eventId(event.getEventId())
+                    .dataKey(event.getDataKey())
+                    .devId(devId)
+                    .outputType(event.getOutputType())
+                    .ruleType(event.getRuleType())
+                    .ruleValue(event.getRuleValue())
+                    .notifyBoxDTO(null)
+                    .thirdServerDTO(null)
+                    .controlDTO(null)
+                    .build();
+
+            switch (event.getOutputType()){
+
+                //알림 톡
+                case "1":
+                    eventDTO.setNotifyBoxDTO(NotifyBoxDTO.builder()
+                            .footRow(event.getFootRow())
+                            .headRow(event.getHeadRow())
+                            .preText(event.getPreText())
+                            .postText(event.getPostText())
+                            .build()
+                    );
+                    break;
+
+                //제어
+                case "2":
+                    eventDTO.setControlDTO(ControlDTO.builder()
+                            .evCode(event.getEvCode())
+                            .build());
+                    break;
+
+                //3rd server
+                default:
+                    eventDTO.setThirdServerDTO(ThirdServerDTO.builder()
+                            .host(event.getHost())
+                            .port(event.getPort())
+                            .path(event.getPath())
+                            .build());
+                    break;
+            }
+            eventDTOS.add(eventDTO);
+        }
+
 
         List<DataModelDTO> devState = dataModelMapper.getDataModel(devId, "0"); //디바이스 상태 모델
         List<DataModelDTO> sensingDt = dataModelMapper.getDataModel(devId, "1"); //센싱 데이터 모델
@@ -174,6 +223,7 @@ public class DeviceController {
                     public List<SelectBoxDTO> boxRules = boxRuleHierarchy;
                     public List<DataModelDTO> devStateModel = devState;
                     public List<DataModelDTO> sensingDataModel = sensingDt;
+                    public List<EventDTO> events = eventDTOS;
                 })
                 .build();
     }
@@ -211,10 +261,106 @@ public class DeviceController {
     @GetMapping("/model/{devType}")
     public ResponseDTO createStateRule(@PathVariable String devType){
 
+        Integer devId = deviceMapper.findDevId(devType);
+
         return ResponseDTO.builder()
                 .data(new Object(){
-                    public List<DataModelVO> model = dataModelMapper.getDataModelWithKey(deviceMapper.findDevId(devType));
+                    public List<DataModelVO> model = dataModelMapper.getDataModelWithKey(devId);
                 })
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    @PostMapping("/rule/{modId}/box/{boxId}/idx/{idx}")
+    public ResponseDTO deleteRule(
+            @PathVariable Integer modId,
+            @PathVariable Integer boxId,
+            @PathVariable Integer idx){
+
+        Integer ReqboxId = boxId;
+        Integer ReqIdx = idx;
+
+        System.out.println(modId);
+
+        dataModelMapper.deleteRuleWithModId(modId);
+
+        return ResponseDTO.builder()
+                .data(new Object(){
+                    public Integer boxId = ReqboxId;
+                    public Integer idx = ReqIdx;
+                })
+                .status(HttpStatus.OK)
+                .msg("delete rule")
+                .build();
+    }
+
+    @PostMapping("/event/{devId}")
+    public ResponseDTO addEvent(@PathVariable Integer devId, @RequestBody EventDTO eventDTO){
+
+        eventDTO.setDevId(devId);
+
+        Map<String, Object> map =new HashMap<>();
+        map.put("event", eventDTO);
+
+        dataModelMapper.addEvent(map);
+        eventDTO.setEventId((Integer)map.get("eventId"));
+
+        switch (eventDTO.getOutputType()){
+
+            //알림 톡
+            case "1":
+                NotifyBoxDTO notifyBoxDTO = eventDTO.getNotifyBoxDTO();
+                notifyBoxDTO.setEventId(eventDTO.getEventId());
+                dataModelMapper.addNotifyBox(notifyBoxDTO);
+                break;
+
+            //제어
+            case "2":
+                ControlDTO controlDTO = eventDTO.getControlDTO();
+                controlDTO.setEventId(eventDTO.getEventId());
+                dataModelMapper.addControl(controlDTO);
+                break;
+
+            //3rd server
+            default:
+                ThirdServerDTO thirdServerDTO =eventDTO.getThirdServerDTO();
+                if(thirdServerDTO.getPort().equals(""))
+                    thirdServerDTO.setPort("80");
+                thirdServerDTO.setEventId(eventDTO.getEventId());
+                dataModelMapper.addThirdServer(thirdServerDTO);
+                break;
+        }
+
+        return ResponseDTO.builder()
+                .data(eventDTO)
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    @DeleteMapping("/event/{eventId}/type/{type}")
+    public ResponseDTO deleteEvent(@PathVariable Integer eventId, @PathVariable String type) {
+
+        switch (type){
+
+            //알림 톡
+            case "1":
+                dataModelMapper.deleteNotifyBox(eventId);
+                break;
+
+            //control
+            case "2":
+                dataModelMapper.deleteControl(eventId);
+                break;
+
+            //third server
+            default:
+                dataModelMapper.deleteThirdServer(eventId);
+                break;
+        }
+        dataModelMapper.deleteEvent(eventId);
+
+        return ResponseDTO.builder()
+                .data(eventId)
                 .status(HttpStatus.OK)
                 .build();
     }

@@ -46,26 +46,33 @@ public class DeviceTestService {
         String hubHost = virtualHubHostVO.getHost();
         Integer port = virtualHubHostVO.getPort();
 
-        TestLogDTO testLogDTO = TestLogDTO.builder()
-                .testStatus("2") //상태는 pending
-                .devId(testSetDTO.getDevId())
-                .devMac(devMac)
-                .build();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("testLogDTO", testLogDTO);
-        testMapper.addDeviceTestLog(map); //pending test log 추가
-
-        Integer testId = Integer.valueOf(map.get("testId").toString()); //sequence 값 추출
-
-        testSetDTO.setDevMac(devMac);
-        testSetDTO.setTestId(testId);
-        testLogDTO.setTestId(testId);
 
         Long startedAt = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli();
 
+        TestLogDTO testLogDTO = null;
+
+        Integer testId = null;
+
         //제어 명령이 포함된 경우에만
         if(haveControlCmd){
+
+            testLogDTO = TestLogDTO.builder()
+                    .testStatus("2") //상태는 pending
+                    .devId(testSetDTO.getDevId())
+                    .devMac(devMac)
+                    .build();
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("testLogDTO", testLogDTO);
+
+            testMapper.addDeviceTestLog(map); //pending test log 추가
+
+            testId = Integer.valueOf(map.get("testId").toString()); //sequence 값 추출
+
+            testSetDTO.setDevMac(devMac);
+            testSetDTO.setTestId(testId);
+            testLogDTO.setTestId(testId);
+
             //test control timeout 설정
             testKeyManagementRepository.saveTestId(TEST_PREFIX + testId.toString(), startedAt);
         }
@@ -77,7 +84,7 @@ public class DeviceTestService {
             HttpStatus responseStatus =  HttpStatus.valueOf(testResponseDTO.getStatus());
 
             //명령 리스트에 제어 명령이 존재하지 않는다면.
-            if(!haveControlCmd){
+            /*if(!haveControlCmd){
                 if(responseStatus.equals(HttpStatus.OK)){
                     testMapper.changeTestLogStatus(testId, "0");
                     testLogDTO.setDurationAt(1L);
@@ -90,7 +97,7 @@ public class DeviceTestService {
                     testLogDTO.setFinishedAt(Timestamp.valueOf(LocalDateTime.now()));
                     testLogDTO.setTestStatus("1");
                 }
-            }
+            }*/
 
             return ResponseDTO.builder()
                     .status(responseStatus)
@@ -100,9 +107,12 @@ public class DeviceTestService {
         } catch (Exception e) {
 
             //명령이 허브까지 도달하지 못하였다면
-            testMapper.changeTestLogStatus(testId, "1"); //실패로 변경
-            testLogDTO.setDurationAt(5L);
-            testLogDTO.setTestStatus("1");
+            //제어 명령이 포함된 경우에만
+            if(haveControlCmd){
+                testMapper.changeTestLogStatus(testId, "1"); //실패로 변경
+                testLogDTO.setDurationAt(5L);
+                testLogDTO.setTestStatus("1");
+            }
             System.out.println("Exception is occured");
             return ResponseDTO.builder()
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)

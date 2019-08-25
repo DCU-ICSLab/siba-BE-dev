@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.sql.Timestamp;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,4 +38,8 @@ public class DeviceDTO {
     private Integer evCodeCnt;
 
     private Boolean haveEntry;
+
+    private Timestamp modDate;
+
+    private Timestamp depDate;
 }

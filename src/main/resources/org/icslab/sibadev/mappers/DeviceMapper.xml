@@ -130,7 +130,9 @@
                dev_name,
                dev_def_name,
                dev_type,
-               category
+               category,
+               mod_date,
+               dep_date
         FROM dev
         WHERE users_id = #{userId};
     </select>
@@ -182,7 +184,8 @@
         SET box_id_cnt=#{boxIdCnt},
             code_cnt=#{codeCnt},
             have_entry=#{haveEntry},
-            evcode_cnt=#{evCodeCnt}
+            evcode_cnt=#{evCodeCnt},
+            mod_date=NOW()
         WHERE dev_id=#{devId}
     </update>
 
@@ -205,7 +208,7 @@
         <selectKey keyProperty="devId" resultType="int" order="BEFORE">
             select NEXTVAL(dev_sequence)
         </selectKey>
-        insert into dev(users_id, dev_id, auth_key, dev_name, dev_def_name, dev_type, category, vhub_id, box_id_cnt, code_cnt, have_entry, evcode_cnt)
+        insert into dev(users_id, dev_id, auth_key, dev_name, dev_def_name, dev_type, category, vhub_id, box_id_cnt, code_cnt, have_entry, evcode_cnt, mod_date, dep_date)
         values (
           #{device.userId},
           #{devId},
@@ -218,7 +221,9 @@
           #{device.boxIdCnt},
           #{device.codeCnt},
           #{device.haveEntry},
-          #{device.evCodeCnt}
+          #{device.evCodeCnt},
+          null,
+          null
         )
     </insert>
 
@@ -299,7 +304,8 @@
           data_key,
           rule_type,
           rule_value,
-          map_val
+          map_val,
+          priority
         )
         values
         (
@@ -310,7 +316,8 @@
           #{rule.dataKey},
           #{rule.ruleType},
           #{rule.ruleValue},
-          #{rule.mapVal}
+          #{rule.mapVal},
+          #{rule.priority}
         )
     </insert>
 
@@ -362,6 +369,8 @@
         <result property="codeCnt" column="code_cnt"/>
         <result property="haveEntry" column="have_entry"/>
         <result property="evCodeCnt" column="evcode_cnt"/>
+        <result property="modDate" column="mod_date"/>
+        <result property="depDate" column="dep_date"/>
     </resultMap>
 
     <resultMap id="BtnDerivationJoin" type="org.icslab.sibadev.devices.device.domain.BtnDerivationJoinVO">

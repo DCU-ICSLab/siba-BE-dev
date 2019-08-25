@@ -3,6 +3,7 @@ package org.icslab.sibadev.devices.device.services;
 import org.icslab.sibadev.common.constants.SkillServer;
 import org.icslab.sibadev.common.domain.response.ResponseDTO;
 import org.icslab.sibadev.devices.device.domain.deployset.DeployDTO;
+import org.icslab.sibadev.mappers.DataModelMapper;
 import org.icslab.sibadev.mappers.DeviceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ public class TextBoxGraphDeployService {
     @Autowired
     private DeviceMapper deviceMapper;
 
+    @Autowired
+    private DataModelMapper dataModelMapper;
+
     public ResponseDTO deploy(Integer devId){
 
         return this.sendToSkillServer(
@@ -23,6 +27,8 @@ public class TextBoxGraphDeployService {
                         .boxDTOList(deviceMapper.getBoxes(devId))
                         .buttonDTOList(deviceMapper.getButtons(devId))
                         .derivationDTOList(deviceMapper.getDerivations(devId))
+                        .dataModelList(dataModelMapper.getAllDataModel(devId))
+                        .rules(dataModelMapper.getAllDeviceRules(devId))
                         .build()
         );
     }
