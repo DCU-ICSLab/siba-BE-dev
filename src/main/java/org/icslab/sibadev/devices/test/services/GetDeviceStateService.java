@@ -73,31 +73,22 @@ public class GetDeviceStateService {
                         isMatch=true;
                         break;
                     case "2":
-                        if(key.getValue().equals(rule.getRuleValue())){
-                            isMatch=true;
-                            states.getKeySet().get(i).setValue(rule.getMapVal());
-                        }
+                        isMatch=key.getValue().equals(rule.getRuleValue());
                         break;
                     case "3":
-                        if(!key.getValue().equals(rule.getRuleValue())){
-                            isMatch=true;
-                            states.getKeySet().get(i).setValue(rule.getMapVal());
-                        }
+                        isMatch=!key.getValue().equals(rule.getRuleValue());
                         break;
                     case "4":
-                        if(key.getValue().compareTo(rule.getRuleValue())>0){
-                            isMatch=true;
-                            states.getKeySet().get(i).setValue(rule.getMapVal());
-                        }
+                        isMatch=key.getValue().compareTo(rule.getRuleValue())>0;
                         break;
                     default:
-                        if(key.getValue().compareTo(rule.getRuleValue())<0){
-                            isMatch=true;
-                            states.getKeySet().get(i).setValue(rule.getMapVal());
-                        }
+                        isMatch=key.getValue().compareTo(rule.getRuleValue())<0;
                         break;
                 }
-                if(isMatch) break;
+                if(isMatch){
+                    states.getKeySet().get(i).setValue(rule.getMapVal());
+                    break;
+                }
             }
             i++;
         }

@@ -14,4 +14,6 @@ public class ControlDTO {
     private Integer eventId;
 
     private Integer evCode;
+
+    private String authKey;
 }

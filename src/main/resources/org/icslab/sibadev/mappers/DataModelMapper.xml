@@ -71,7 +71,8 @@
       LEFT OUTER JOIN notify_box as n ON n.event_id = e.event_id
       LEFT OUTER JOIN third_ser as t ON t.event_id = e.event_id
       LEFT OUTER JOIN control as c ON c.event_id = e.event_id
-      WHERE e.dev_id=#{devId};
+      WHERE e.dev_id=#{devId}
+      ORDER BY e.priority ASC;
     </select>
 
     <insert id="insertDataModel" parameterType="org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO">
@@ -120,7 +121,8 @@
           data_key,
           output_type,
           rule_type,
-          rule_value
+          rule_value,
+          priority
         )
         values(
           #{eventId},
@@ -128,7 +130,8 @@
           #{event.dataKey},
           #{event.outputType},
           #{event.ruleType},
-          #{event.ruleValue}
+          #{event.ruleValue},
+          #{event.priority}
         )
     </insert>
 
@@ -167,11 +170,13 @@
     <insert id="addControl" parameterType="org.icslab.sibadev.devices.device.domain.event.ControlDTO">
         insert into control(
           event_id,
-          ev_code
+          ev_code,
+          auth_key
         )
         values(
           #{eventId},
-          #{evCode}
+          #{evCode},
+          #{authKey}
         )
     </insert>
 
@@ -237,6 +242,7 @@
     <resultMap id="EventVO" type="org.icslab.sibadev.devices.device.domain.event.EventVO">
         <constructor>
             <arg name="eventId" column="event_id" javaType="Integer"></arg>
+            <arg name="priority" column="priority" javaType="Integer"></arg>
             <arg name="dataKey" column="data_key" javaType="String"></arg>
             <arg name="outputType" column="output_type" javaType="String"></arg>
             <arg name="ruleType" column="rule_type" javaType="String"></arg>
@@ -249,6 +255,7 @@
             <arg name="port" column="port" javaType="String"></arg>
             <arg name="path" column="path" javaType="String"></arg>
             <arg name="evCode" column="ev_code" javaType="Integer"></arg>
+            <arg name="authKey" column="auth_key" javaType="String"></arg>
         </constructor>
     </resultMap>
 </mapper>

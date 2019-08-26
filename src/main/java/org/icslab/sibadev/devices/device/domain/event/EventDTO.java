@@ -13,6 +13,8 @@ public class EventDTO {
 
     private Integer eventId;
 
+    private Integer priority;
+
     private Integer devId;
 
     private String dataKey;

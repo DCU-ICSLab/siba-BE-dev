@@ -1,5 +1,6 @@
 package org.icslab.sibadev.devices.device.domain.event;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class EventVO {
     private Integer eventId;
+
+    private Integer priority;
 
     private String dataKey;
 
@@ -22,8 +25,10 @@ public class EventVO {
 
     private String postText;
 
+    @JsonIgnore
     private Integer headRow;
 
+    @JsonIgnore
     private Integer footRow;
 
     private String host;
@@ -33,4 +38,6 @@ public class EventVO {
     private String path;
 
     private Integer evCode;
+
+    private String authKey;
 }

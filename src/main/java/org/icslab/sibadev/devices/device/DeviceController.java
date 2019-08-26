@@ -266,6 +266,7 @@ public class DeviceController {
         return ResponseDTO.builder()
                 .data(new Object(){
                     public List<DataModelVO> model = dataModelMapper.getDataModelWithKey(devId);
+                    public List<EventVO> events = dataModelMapper.getAllEvents(devId);
                 })
                 .status(HttpStatus.OK)
                 .build();
