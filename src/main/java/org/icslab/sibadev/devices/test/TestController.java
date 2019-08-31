@@ -1,10 +1,7 @@
 package org.icslab.sibadev.devices.test;
 
 import org.icslab.sibadev.common.domain.response.ResponseDTO;
-import org.icslab.sibadev.devices.test.domain.BoxIndexDTO;
-import org.icslab.sibadev.devices.test.domain.TestResponseDTO;
-import org.icslab.sibadev.devices.test.domain.TestSetDTO;
-import org.icslab.sibadev.devices.test.domain.TextBoxDTO;
+import org.icslab.sibadev.devices.test.domain.*;
 import org.icslab.sibadev.devices.test.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,11 +27,22 @@ public class TestController {
     @Autowired
     private GetDeviceStateService getDeviceStateService;
 
-    @GetMapping("/test/{devId}/box/{boxId}")
-    public ResponseDTO getBox(@PathVariable Integer devId, @PathVariable Integer boxId){
+    @Autowired
+    private JudgementRequestService judgementRequestService;
+
+    @PostMapping("/test/{devId}/box/{boxId}")
+    public ResponseDTO getBox(@PathVariable Integer devId, @PathVariable Integer boxId, @RequestBody ConvertTextDTO convertTextDTO){
+
+        String dynamic = null;
+        if(convertTextDTO!=null && convertTextDTO.getText()!=null) dynamic =convertTextDTO.getText();
 
         //텍스트 박스 조회
         TextBoxDTO  textBoxDTO = deviceBoxSearchSerivce.search(devId, boxId);
+
+        //judge box라면
+        if(textBoxDTO.getBoxType()==7){
+            return judgementRequestService.judgementRequest(textBoxDTO, devId, dynamic);
+        }
 
         return ResponseDTO.builder()
                 .status(HttpStatus.OK)

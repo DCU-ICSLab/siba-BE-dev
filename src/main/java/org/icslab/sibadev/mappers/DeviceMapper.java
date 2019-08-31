@@ -93,5 +93,9 @@ public interface DeviceMapper {
 
     void createStateRule(Map<String,Object> map);
 
+    String getDevMacWithDevId(Integer devId);
+
+    void updateDeployDate(Integer devId);
+
     //void multipleTableMultipleInsert();
 }

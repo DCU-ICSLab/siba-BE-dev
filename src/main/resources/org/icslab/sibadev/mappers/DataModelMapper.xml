@@ -105,7 +105,7 @@
             #{item.dataKey},
             #{item.ruleType},
             #{item.ruleValue},
-            #{item.mapVal}
+            #{item.mapVal},
             #{item.priority}
             )
         </foreach>

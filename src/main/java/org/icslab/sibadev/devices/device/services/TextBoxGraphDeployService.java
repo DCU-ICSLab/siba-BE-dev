@@ -26,6 +26,8 @@ public class TextBoxGraphDeployService {
 
         List<EventVO> events = dataModelMapper.getAllEvents(devId);
 
+        deviceMapper.updateDeployDate(devId);
+
         return this.sendToSkillServer(
                 SkillServer.SKILL_SERVER_HOST+SkillServer.TEXTBOX_GRAPH_DEPLOY_URL,
                 DeployDTO.builder()

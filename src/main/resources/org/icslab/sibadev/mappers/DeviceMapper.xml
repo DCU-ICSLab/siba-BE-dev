@@ -327,6 +327,18 @@
         where dev_mac=#{devMac}
     </select>
 
+    <select id="getDevMacWithDevId" parameterType="Integer" resultType="String">
+        select dev_mac
+        from conn_dev
+        where dev_id=#{devId}
+    </select>
+
+    <update id="updateDeployDate" parameterType="Integer">
+        update dev
+        set dep_date = CURRENT_TIMESTAMP(2)
+        where dev_id=#{devId}
+    </update>
+
     <delete id="deleteConnectedDevice" parameterType="String">
         delete from conn_dev
         where dev_mac=#{devMac}

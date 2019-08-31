@@ -189,6 +189,7 @@ public class DeviceController {
                             .headRow(event.getHeadRow())
                             .preText(event.getPreText())
                             .postText(event.getPostText())
+                            .eventId(event.getEventId())
                             .build()
                     );
                     break;
@@ -197,6 +198,8 @@ public class DeviceController {
                 case "2":
                     eventDTO.setControlDTO(ControlDTO.builder()
                             .evCode(event.getEvCode())
+                            .authKey(event.getAuthKey())
+                            .eventId(event.getEventId())
                             .build());
                     break;
 
@@ -206,6 +209,7 @@ public class DeviceController {
                             .host(event.getHost())
                             .port(event.getPort())
                             .path(event.getPath())
+                            .eventId(event.getEventId())
                             .build());
                     break;
             }

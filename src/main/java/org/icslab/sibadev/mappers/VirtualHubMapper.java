@@ -36,5 +36,7 @@ public interface VirtualHubMapper {
 
     VirtualHubHostVO getVirtualHubHostInfoWithKey(String hubKey);
 
+    VirtualHubHostVO getVirtualHubHostInfoByDevId(Integer devId);
+
     List<Integer> getAllLinkedRepoId(Integer hubId);
 }

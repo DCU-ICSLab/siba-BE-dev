@@ -34,6 +34,10 @@
         SELECT hub_ip, hub_port, hub_key FROM vhub WHERE hub_key=#{hubKey}
     </select>
 
+    <select id="getVirtualHubHostInfoByDevId" parameterType="Integer" resultMap="VirtualHubHostVO">
+        SELECT hub_ip, hub_port, hub_key FROM vhub WHERE vhub_id=(select vhub_id from dev where dev_id=#{devId})
+    </select>
+
     <!-- userId를 이용하여 userinfo get -->
     <insert id="createHub" parameterType="java.util.Map">
         <selectKey keyProperty="vhubId" resultType="int" order="BEFORE">
