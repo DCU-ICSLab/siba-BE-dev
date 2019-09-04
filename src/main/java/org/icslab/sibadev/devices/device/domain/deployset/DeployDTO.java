@@ -4,6 +4,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 import org.icslab.sibadev.devices.device.domain.DeviceDTO;
+import org.icslab.sibadev.devices.device.domain.StateRuleDTO;
+import org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO;
+import org.icslab.sibadev.devices.device.domain.event.EventDTO;
 
 import java.util.List;
 
@@ -18,4 +21,10 @@ public class DeployDTO {
     private List<ButtonDTO> buttonDTOList;
 
     private List<DerivationDTO> derivationDTOList;
+
+    private List<DataModelDTO> dataModelList;
+
+    private List<StateRuleDTO> rules;
+
+    private List<EventDTO> events;
 }

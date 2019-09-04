@@ -1,6 +1,8 @@
 package org.icslab.sibadev.devices.device.domain.textboxgraph;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.icslab.sibadev.devices.test.domain.TestLogVO;
 
 import java.util.List;
 
@@ -30,4 +32,7 @@ public class TextBoxGraphDTO {
     private List<TextBoxDTO> pallet;
 
     private List<LinkerDTO> linkers;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private List<TestLogVO> testLogList;
 }

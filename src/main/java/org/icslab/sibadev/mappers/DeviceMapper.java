@@ -12,6 +12,7 @@ import org.icslab.sibadev.devices.device.domain.textboxgraph.TextBoxDTO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -20,6 +21,15 @@ public interface DeviceMapper {
     DeviceDTO getDevice(Integer devId);
 
     Integer getRepositoryOwner(String devKey);
+
+    Integer getDevIdWithDevMac(String devMac);
+
+    String getBtnName(
+            @Param("eventCode")
+            Integer eventCode,
+            @Param("devId")
+            Integer devId
+    );
 
     List<DeviceShortDTO> getDeviceAndHub(Long userId);
 
@@ -37,7 +47,7 @@ public interface DeviceMapper {
 
     List<ConnectedDeviceVO> getConnectedDeviceInfo(Integer devId);
 
-    void createDevice(DeviceDTO deviceDTO);
+    void createDevice(Map<String, Object> devSet);
 
     void updateDevice(DeviceDTO deviceDTO);
 
@@ -74,6 +84,18 @@ public interface DeviceMapper {
             List<LinkerDTO> linkerDTOList,
             @Param("devId")
             Integer devId);
+
+    List<BoxRuleVO> getBoxAndRule(
+            @Param("devId")
+            Integer devId,
+            @Param("boxType")
+            String boxType);
+
+    void createStateRule(Map<String,Object> map);
+
+    String getDevMacWithDevId(Integer devId);
+
+    void updateDeployDate(Integer devId);
 
     //void multipleTableMultipleInsert();
 }

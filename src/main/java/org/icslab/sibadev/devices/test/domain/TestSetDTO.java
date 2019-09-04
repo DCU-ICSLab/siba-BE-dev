@@ -13,7 +13,11 @@ public class TestSetDTO {
 
     private Integer devId;
 
-    private String userId;
+    private Integer userId;
+
+    private Integer testId;
+
+    private String devMac;
 
     private List<CommandDTO> cmdList;
 }

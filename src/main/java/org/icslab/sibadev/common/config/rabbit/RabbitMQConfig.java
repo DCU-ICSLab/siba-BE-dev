@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class RabbitMQConfig {
 
+    //---------------------------------
+    //queue
     @Bean
     Queue keepAliveQueue() {
         return new Queue(RabbitMQConstants.KEEP_ALIVE_QUEUE, false);
@@ -31,6 +33,13 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    Queue deviceControlQueue() {
+        return new Queue(RabbitMQConstants.DEVICE_CONTROL_QUEUE, false);
+    }
+
+    //---------------------------------
+    //exchange
+    @Bean
     TopicExchange keepAliveTopicExchange() {
         return new TopicExchange(RabbitMQConstants.KEEP_ALIVE_EXCHANGE);
     }
@@ -45,6 +54,13 @@ public class RabbitMQConfig {
         return new TopicExchange(RabbitMQConstants.DEVICE_ESTABLISH_EXCHANGE);
     }
 
+    @Bean
+    TopicExchange deviceControlExchange() {
+        return new TopicExchange(RabbitMQConstants.DEVICE_CONTROL_EXCHANGE);
+    }
+
+    //---------------------------------
+    //binding
     @Bean
     Binding bindingKeepAlive(Queue keepAliveQueue, TopicExchange keepAliveTopicExchange) {
         return BindingBuilder
@@ -69,6 +85,16 @@ public class RabbitMQConfig {
                 .with(RabbitMQConstants.DEVICE_ESTABLISH_ROUTE_KEY);
     }
 
+    @Bean
+    Binding bindingDeviceControl(Queue deviceControlQueue, TopicExchange deviceControlExchange) {
+        return BindingBuilder
+                .bind(deviceControlQueue)
+                .to(deviceControlExchange)
+                .with(RabbitMQConstants.DEVICE_CONTROL_ROUTE_KEY);
+    }
+
+    //---------------------------------
+    //definition
     @Bean
     public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
         final var rabbitTemplate = new RabbitTemplate(connectionFactory);

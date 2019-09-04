@@ -27,17 +27,24 @@
         WHERE b.dev_id= #{devId} AND b.box_id = #{boxId}
     </select>
 
-    <insert id="addDeviceTestLog" parameterType="org.icslab.sibadev.devices.test.domain.TestLogDTO">
+    <select id="getTestLogList" parameterType="Integer" resultMap="TestLogVO">
+        SELECT t_id, t_status, dev_mac, fin_at, duration_at
+        FROM tlog
+        WHERE dev_id=#{devId}
+        ORDER BY t_id DESC;
+    </select>
+
+    <insert id="addDeviceTestLog" parameterType="java.util.Map">
         <selectKey keyProperty="testId" resultType="int" order="BEFORE">
             select NEXTVAL(tlog_sequence)
         </selectKey>
         insert into tlog(dev_id, t_id, dev_mac, t_status)
         values
         (
-          #{devId},
+          #{testLogDTO.devId},
           #{testId},
-          #{devMac},
-          #{testStatus}
+          #{testLogDTO.devMac},
+          #{testLogDTO.testStatus}
         )
     </insert>
 
@@ -47,12 +54,20 @@
         where t_id=#{testId};
     </update>
 
+    <select id="getTestLogStatus" parameterType="Integer" resultType="String">
+        select t_status from tlog where t_id=#{testId}
+    </select>
+
+    <select id="getTestOwner" parameterType="Integer" resultType="Integer">
+        select users_id from dev where dev_id=(select dev_id from tlog where t_id=#{testId})
+    </select>
+
     <update id="changeTestLog" parameterType="org.icslab.sibadev.devices.test.domain.TestLogDTO">
         update tlog
         set
-        t_status=#{testStats},
+        t_status=#{testStatus},
         fin_at=#{finishedAt},
-        duration_at=#{durtaionAt}
+        duration_at=#{durationAt}
         where t_id=#{testId};
     </update>
 
@@ -72,5 +87,15 @@
         <result property="evCode" column="ev_code"/>
         <result property="btnType" column="btn_type"/>
         <result property="cboxId" column="cbox_id"/>
+    </resultMap>
+
+    <resultMap id="TestLogVO" type="org.icslab.sibadev.devices.test.domain.TestLogVO">
+        <constructor>
+            <arg name="testId" column="t_id" javaType="Integer"></arg>
+            <arg name="testStatus" column="t_status" javaType="String"></arg>
+            <arg name="devMac" column="dev_mac" javaType="String"></arg>
+            <arg name="finishedAt" column="fin_at" javaType="java.sql.Timestamp"></arg>
+            <arg name="durationAt" column="duration_at" javaType="Long"></arg>
+        </constructor>
     </resultMap>
 </mapper>

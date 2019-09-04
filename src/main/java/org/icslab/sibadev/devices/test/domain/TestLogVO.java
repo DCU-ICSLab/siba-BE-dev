@@ -10,11 +10,11 @@ import java.sql.Timestamp;
 public class TestLogVO {
     private Integer testId;
 
-    private Character testStatus;
+    private String testStatus;
 
     private String devMac;
 
     private Timestamp finishedAt;
 
-    private Timestamp durationAt;
+    private Long durationAt;
 }

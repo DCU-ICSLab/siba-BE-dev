@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.icslab.sibadev.mappers.DataModelMapper">
+
+    <select id="getDataModel" parameterType="java.util.Map" resultMap="DataModelDTO">
+        SELECT
+          data_key,
+          dev_id,
+          data_type,
+          is_ev,
+          mod_type
+        FROM data_model
+        WHERE dev_id=#{devId} AND mod_type=#{modType}
+    </select>
+
+    <select id="getAllDataModel" parameterType="Integer" resultMap="DataModelDTO">
+        SELECT
+          data_key,
+          dev_id,
+          data_type,
+          is_ev,
+          mod_type
+        FROM data_model
+        WHERE dev_id=#{devId}
+    </select>
+
+    <select id="getDataModelWithKey" resultMap="DataModelVO" parameterType="Integer">
+      SELECT data_key, data_type, is_ev, mod_type
+      FROM data_model
+      where dev_id=#{devId}
+    </select>
+
+    <select id="getAllRules" parameterType="java.util.Map" resultMap="StateRuleDTO">
+      SELECT
+      mod_id,
+      mod_dev_id,
+      dev_id,
+      box_id,
+      data_key,
+      rule_type,
+      rule_value,
+      map_val,
+      priority
+      FROM res_box_crs
+      where dev_id=#{devId} AND box_id=#{boxId}
+      ORDER BY priority ASC
+    </select>
+
+    <select id="getAllDeviceRules" parameterType="Integer" resultMap="StateRuleDTO">
+      SELECT
+      mod_id,
+      mod_dev_id,
+      dev_id,
+      box_id,
+      data_key,
+      rule_type,
+      rule_value,
+      map_val,
+      priority
+      FROM res_box_crs
+      where dev_id=#{devId}
+      ORDER BY priority ASC
+    </select>
+
+    <select id="getAllEvents" parameterType="Integer" resultMap="EventVO">
+      SELECT *
+      FROM event as e
+      LEFT OUTER JOIN notify_box as n ON n.event_id = e.event_id
+      LEFT OUTER JOIN third_ser as t ON t.event_id = e.event_id
+      LEFT OUTER JOIN control as c ON c.event_id = e.event_id
+      WHERE e.dev_id=#{devId}
+      ORDER BY e.priority ASC;
+    </select>
+
+    <insert id="insertDataModel" parameterType="org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO">
+        INSERT INTO data_model (
+        data_key,
+        dev_id,
+        data_type,
+        is_ev,
+        mod_type
+        )
+        VALUE
+        (
+        #{dataKey},
+        #{devId},
+        #{dataType},
+        #{isEv},
+        #{modType}
+        )
+    </insert>
+
+    <insert id="insertAllRules" parameterType="java.util.Map">
+        insert into res_box_crs(mod_id, mod_dev_id, dev_id, box_id, data_key, rule_type, rule_value, map_val, priority)
+        values
+        <foreach collection="rules" item="item" separator=" , ">
+            (
+            #{item.modId},
+            #{item.modDevId},
+            #{item.devId},
+            #{item.boxId},
+            #{item.dataKey},
+            #{item.ruleType},
+            #{item.ruleValue},
+            #{item.mapVal},
+            #{item.priority}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="addEvent" parameterType="java.util.Map">
+        <selectKey keyProperty="eventId" resultType="int" order="BEFORE">
+            select NEXTVAL(event_sequence)
+        </selectKey>
+        insert into event(
+          event_id,
+          dev_id,
+          data_key,
+          output_type,
+          rule_type,
+          rule_value,
+          priority
+        )
+        values(
+          #{eventId},
+          #{event.devId},
+          #{event.dataKey},
+          #{event.outputType},
+          #{event.ruleType},
+          #{event.ruleValue},
+          #{event.priority}
+        )
+    </insert>
+
+    <insert id="addNotifyBox" parameterType="org.icslab.sibadev.devices.device.domain.event.NotifyBoxDTO">
+        insert into notify_box(
+          event_id,
+          pre_text,
+          post_text,
+          head_row,
+          foot_row
+        )
+        values(
+          #{eventId},
+          #{preText},
+          #{postText},
+          #{headRow},
+          #{footRow}
+        )
+    </insert>
+
+    <insert id="addThirdServer" parameterType="org.icslab.sibadev.devices.device.domain.event.ThirdServerDTO">
+        insert into third_ser(
+          event_id,
+          host,
+          port,
+          path
+        )
+        values(
+          #{eventId},
+          #{host},
+          #{port},
+          #{path}
+        )
+    </insert>
+
+    <insert id="addControl" parameterType="org.icslab.sibadev.devices.device.domain.event.ControlDTO">
+        insert into control(
+          event_id,
+          ev_code,
+          auth_key
+        )
+        values(
+          #{eventId},
+          #{evCode},
+          #{authKey}
+        )
+    </insert>
+
+    <delete id="deleteRule" parameterType="Integer">
+        delete from res_box_crs
+        where dev_id=#{devId}
+    </delete>
+
+    <delete id="deleteRuleWithModId" parameterType="Integer">
+        delete from res_box_crs
+        where mod_id=#{modId}
+    </delete>
+
+    <delete id="deleteEvent" parameterType="Integer">
+        delete from event
+        where event_id=#{eventId}
+    </delete>
+
+    <delete id="deleteNotifyBox" parameterType="Integer">
+        delete from notify_box
+        where event_id=#{eventId}
+    </delete>
+
+    <delete id="deleteThirdServer" parameterType="Integer">
+        delete from third_ser
+        where event_id=#{eventId}
+    </delete>
+
+    <delete id="deleteControl" parameterType="Integer">
+        delete from control
+        where event_id=#{eventId}
+    </delete>
+
+    <resultMap id="DataModelDTO" type="org.icslab.sibadev.devices.device.domain.datamodel.DataModelDTO">
+        <result property="dataKey" column="data_key"/>
+        <result property="devId" column="dev_id"/>
+        <result property="dataType" column="data_type"/>
+        <result property="isEv" column="is_ev"/>
+        <result property="modType" column="mod_type"/>
+    </resultMap>
+
+    <resultMap id="DataModelVO" type="org.icslab.sibadev.devices.device.domain.datamodel.DataModelVO">
+        <constructor>
+            <arg name="dataKey" column="data_key" javaType="String"></arg>
+            <arg name="dataType" column="data_type" javaType="String"></arg>
+            <arg name="isEv" column="is_ev" javaType="Boolean"></arg>
+            <arg name="modType" column="mod_type" javaType="String"></arg>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="StateRuleDTO" type="org.icslab.sibadev.devices.device.domain.StateRuleDTO">
+        <result property="modId" column="mod_id"/>
+        <result property="modDevId" column="mod_dev_id"/>
+        <result property="devId" column="dev_id"/>
+        <result property="boxId" column="box_id"/>
+        <result property="dataKey" column="data_key"/>
+        <result property="ruleType" column="rule_type"/>
+        <result property="ruleValue" column="rule_value"/>
+        <result property="mapVal" column="map_val"/>
+        <result property="priority" column="priority"/>
+    </resultMap>
+
+    <resultMap id="EventVO" type="org.icslab.sibadev.devices.device.domain.event.EventVO">
+        <constructor>
+            <arg name="eventId" column="event_id" javaType="Integer"></arg>
+            <arg name="priority" column="priority" javaType="Integer"></arg>
+            <arg name="dataKey" column="data_key" javaType="String"></arg>
+            <arg name="outputType" column="output_type" javaType="String"></arg>
+            <arg name="ruleType" column="rule_type" javaType="String"></arg>
+            <arg name="ruleValue" column="rule_value" javaType="String"></arg>
+            <arg name="preText" column="pre_text" javaType="String"></arg>
+            <arg name="postText" column="post_text" javaType="String"></arg>
+            <arg name="headRow" column="head_row" javaType="Integer"></arg>
+            <arg name="footRow" column="foot_row" javaType="Integer"></arg>
+            <arg name="host" column="host" javaType="String"></arg>
+            <arg name="port" column="port" javaType="String"></arg>
+            <arg name="path" column="path" javaType="String"></arg>
+            <arg name="evCode" column="ev_code" javaType="Integer"></arg>
+            <arg name="authKey" column="auth_key" javaType="String"></arg>
+        </constructor>
+    </resultMap>
+</mapper>

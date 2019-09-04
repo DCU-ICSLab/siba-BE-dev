@@ -17,9 +17,9 @@ public class TestLogDTO {
 
     private String devMac;
 
-    private Character testStatus;
+    private String testStatus;
 
     private Timestamp finishedAt;
 
-    private Timestamp durtaionAt;
+    private Long durationAt;
 }

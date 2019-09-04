@@ -1,5 +1,6 @@
 package org.icslab.sibadev.common.config.security.oauth2;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.oauth2.sdk.*;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
@@ -7,6 +8,9 @@ import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
 import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.id.ClientID;
+import org.icslab.sibadev.user.domain.KakaoTokenDetailDTO;
+import org.icslab.sibadev.user.services.TokenManagementService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -22,6 +26,9 @@ import java.net.URI;
 
 public class SpringWebClientAuthorizationCodeTokenResponseClient implements OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> {
     private static final String INVALID_TOKEN_RESPONSE_ERROR_CODE = "invalid_token_response";
+
+    @Autowired
+    private TokenManagementService tokenManagementService;
 
     @Override
     public OAuth2AccessTokenResponse getTokenResponse(OAuth2AuthorizationCodeGrantRequest authorizationGrantRequest) {
@@ -44,7 +51,6 @@ public class SpringWebClientAuthorizationCodeTokenResponseClient implements OAut
         ClientID clientId = new ClientID(clientRegistration.getClientId());
         Secret clientSecret = new Secret(clientRegistration.getClientSecret());
 
-
         // ClientAuthenticationMethod가 post/basic 인지
         ClientAuthentication clientAuthentication = null;
         if (ClientAuthenticationMethod.POST.equals(clientRegistration.getClientAuthenticationMethod())) {
@@ -56,12 +62,18 @@ public class SpringWebClientAuthorizationCodeTokenResponseClient implements OAut
         //authorization_code를 access_token으로 교환
         TokenResponse tokenResponse = null;
         try {
-            TokenRequest tokenRequest = new TokenRequest(tokenUri, clientAuthentication, authorizationCodeGrant);
+            TokenRequest tokenRequest = new TokenRequest(tokenUri, clientAuthentication, authorizationCodeGrant); // authorization_code를 access_token으로 교환
+
             HTTPRequest httpRequest = tokenRequest.toHTTPRequest();
             httpRequest.setAccept(MediaType.APPLICATION_JSON_VALUE);
             httpRequest.setConnectTimeout(30000);
             httpRequest.setReadTimeout(30000);
             tokenResponse = TokenResponse.parse(httpRequest.send());
+
+            //카카오로 부터 받아온 accessToken, refreshToken, 기타 expire 정보 객체로 변환, tokenManagementService에게 전송
+            ObjectMapper objectMapper = new ObjectMapper();
+            KakaoTokenDetailDTO kakaoTokenDetailDTO = objectMapper.readValue(tokenResponse.toHTTPResponse().getContentAsJSONObject().toJSONString(), KakaoTokenDetailDTO.class);
+            tokenManagementService.manage(kakaoTokenDetailDTO);
 
         } catch (ParseException | IOException ex) {
             OAuth2Error oauth2Error = new OAuth2Error(INVALID_TOKEN_RESPONSE_ERROR_CODE,

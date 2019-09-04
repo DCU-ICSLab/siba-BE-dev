@@ -1,23 +1,13 @@
 package org.icslab.sibadev.devices.test;
 
-import org.icslab.sibadev.common.config.security.oauth2.UserPrincipal;
 import org.icslab.sibadev.common.domain.response.ResponseDTO;
-import org.icslab.sibadev.devices.test.constants.TestResponseMessageSet;
-import org.icslab.sibadev.devices.test.domain.TestLogDTO;
-import org.icslab.sibadev.devices.test.domain.TestResponseDTO;
-import org.icslab.sibadev.devices.test.domain.TestSetDTO;
-import org.icslab.sibadev.devices.test.domain.TextBoxDTO;
-import org.icslab.sibadev.devices.test.services.DeviceBoxSearchSerivce;
-import org.icslab.sibadev.devices.vhub.domain.VirtualHubHostVO;
-import org.icslab.sibadev.mappers.DeviceMapper;
-import org.icslab.sibadev.mappers.TestMapper;
-import org.icslab.sibadev.mappers.VirtualHubMapper;
-import org.icslab.sibadev.user.domain.UserDTO;
+import org.icslab.sibadev.devices.test.domain.*;
+import org.icslab.sibadev.devices.test.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
 
 @RestController
 public class TestController {
@@ -26,19 +16,33 @@ public class TestController {
     private DeviceBoxSearchSerivce deviceBoxSearchSerivce;
 
     @Autowired
-    private VirtualHubMapper virtualHubMapper;
+    private DeviceTestService deviceTestService;
 
     @Autowired
-    private TestMapper testMapper;
+    private GetReservationService getReservationService;
 
     @Autowired
-    private DeviceMapper deviceMapper;
+    private CancelReservationService cancelReservationService;
 
-    @GetMapping("/test/{devId}/box/{boxId}")
-    public ResponseDTO getBox(@PathVariable Integer devId, @PathVariable Integer boxId){
+    @Autowired
+    private GetDeviceStateService getDeviceStateService;
+
+    @Autowired
+    private JudgementRequestService judgementRequestService;
+
+    @PostMapping("/test/{devId}/box/{boxId}")
+    public ResponseDTO getBox(@PathVariable Integer devId, @PathVariable Integer boxId, @RequestBody ConvertTextDTO convertTextDTO){
+
+        String dynamic = null;
+        if(convertTextDTO!=null && convertTextDTO.getText()!=null) dynamic =convertTextDTO.getText();
 
         //텍스트 박스 조회
         TextBoxDTO  textBoxDTO = deviceBoxSearchSerivce.search(devId, boxId);
+
+        //judge box라면
+        if(textBoxDTO.getBoxType()==7){
+            return judgementRequestService.judgementRequest(textBoxDTO, devId, dynamic);
+        }
 
         return ResponseDTO.builder()
                 .status(HttpStatus.OK)
@@ -46,51 +50,58 @@ public class TestController {
                 .build();
     }
 
+    @GetMapping("/test/{vHubId}/reservation/{devMac}")
+    public ResponseDTO getReservation(@PathVariable String devMac, @PathVariable Integer vHubId){
+
+        TextBoxDTO textBoxDTO = getReservationService.getReservationForHub(devMac, vHubId);
+
+        return ResponseDTO.builder()
+                .data(textBoxDTO)
+                .msg("reservation info")
+                .status(HttpStatus.OK)
+                .build();
+    }
+
     @PostMapping("/test/{devMac}")
-    public ResponseDTO getBox(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable String devMac, @RequestBody TestSetDTO testSetDTO){
-
+    public ResponseDTO getBox(@PathVariable String devMac, @RequestBody TestSetDTO testSetDTO){
+        System.out.println(devMac);
         System.out.println(testSetDTO);
+        return deviceTestService.process(devMac, testSetDTO);
+    }
 
-        VirtualHubHostVO virtualHubHostVO = virtualHubMapper.getVirtualHubHostInfo(testSetDTO.getVhubId());
-        String hubHost = virtualHubHostVO.getHost();
-        Integer port = virtualHubHostVO.getPort();
+    @PostMapping("/test/{vHubId}/reservation/{resId}")
+    public ResponseDTO getReservation(@PathVariable Integer resId, @PathVariable Integer vHubId){
 
-        testSetDTO.setUserId(userPrincipal.getId().toString());
+        TestResponseDTO testResponseDTO = cancelReservationService.cancelRequest(vHubId, resId);
 
-        if(hubHost!=null && port !=null){
-            RestTemplate restTemplate = new RestTemplate();
-            System.out.println("send to Hub");
+        return ResponseDTO.builder()
+                .msg(testResponseDTO.getMsg())
+                .status(HttpStatus.valueOf(testResponseDTO.getStatus()))
+                .build();
+    }
 
-            TestLogDTO testLogDTO = TestLogDTO.builder()
-                    .testStatus('2') //상태는 pending
-                    .devId(testSetDTO.getDevId())
-                    .devMac(devMac)
-                    .build();
+    @PostMapping("/test/{vHubId}/state/{devMac}")
+    public ResponseDTO getDeviceState(@PathVariable String devMac, @PathVariable Integer vHubId, @RequestBody BoxIndexDTO boxIndexDTO){
 
-            testMapper.addDeviceTestLog(testLogDTO);
-
-            Integer testId = testLogDTO.getTestId();
-            System.out.println(testId);
-
-            try{
-                TestResponseDTO testResponseDTO = restTemplate.postForObject("http://"+hubHost+":"+port+"/dev/"+devMac, testSetDTO, TestResponseDTO.class);
-
-                return ResponseDTO.builder()
-                        .status(HttpStatus.valueOf(testResponseDTO.getStatus()))
-                        .msg(testResponseDTO.getMsg())
-                        .build();
-            }catch (Exception e){
-                testMapper.changeTestLogStatus(testId, '1'); //실패로 변경
-                return ResponseDTO.builder()
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .msg(TestResponseMessageSet.HUB_TEST_FAIL_MESSAGE)
-                        .build();
-            }
-        }
-        else{
+        try{
+            TextBoxDTO textBoxDTO = getDeviceStateService.process(devMac, vHubId, boxIndexDTO.getDevId(), boxIndexDTO.getBoxId());
             return ResponseDTO.builder()
+                    .data(textBoxDTO)
+                    .msg("state info")
+                    .status(HttpStatus.OK)
+                    .build();
+        }
+        catch(Exception e){
+            return ResponseDTO.builder()
+                    .data(TextBoxDTO.builder()
+                            .preText("요청하신 명령을 수행하는 중에 오류가 발생했습니다.")
+                            .buttons(new ArrayList<>())
+                            .boxType(6)
+                            .boxId(-1)
+                            .postText("")
+                            .build())
+                    .msg("state info")
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .msg(TestResponseMessageSet.HUB_TEST_FAIL_MESSAGE)
                     .build();
         }
     }
